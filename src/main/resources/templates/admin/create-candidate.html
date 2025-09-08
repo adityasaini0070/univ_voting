@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>Create Candidate</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}" />
+</head>
+<body>
+<div class="container">
+    <h2>Create Candidate</h2>
+    <form th:action="@{/admin/create-candidate}" method="post">
+        <div>
+            <label for="name">Candidate Name:</label>
+            <input type="text" id="name" name="name" required />
+        </div>
+        <div>
+            <label for="description">Description / Manifesto:</label>
+            <input type="text" id="description" name="description" required />
+        </div>
+        <div>
+            <label for="electionId">Election:</label>
+            <select id="electionId" name="electionId">
+                <option th:each="election : ${elections}"
+                        th:value="${election.id}"
+                        th:text="${election.name}"></option>
+            </select>
+        </div>
+        <button type="submit">Create Candidate</button>
+    </form>
+    <div class="bottom-links">
+        <a th:href="@{/admin/elections}">Back to Admin Dashboard</a>
+    </div>
+</div>
+</body>
+</html>

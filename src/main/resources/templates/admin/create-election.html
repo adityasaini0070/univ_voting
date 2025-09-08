@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>Create Election</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}" />
+</head>
+<body>
+<div class="container">
+    <h2>Create Election</h2>
+    <form th:action="@{/admin/create-election}" method="post">
+        <div>
+            <label for="name">Election Name:</label>
+            <input type="text" id="name" name="name" required />
+        </div>
+        <div>
+            <label for="startTime">Start Time:</label>
+            <input type="datetime-local" id="startTime" name="startTime" required />
+        </div>
+        <div>
+            <label for="endTime">End Time:</label>
+            <input type="datetime-local" id="endTime" name="endTime" required />
+        </div>
+        <button type="submit">Create Election</button>
+    </form>
+    <div class="bottom-links">
+        <a th:href="@{/admin/elections}">Back to Admin Dashboard</a>
+    </div>
+</div>
+</body>
+</html>

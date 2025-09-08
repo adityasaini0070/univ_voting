@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>Edit Election</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}" />
+</head>
+<body>
+<div class="container">
+    <h2>Edit Election</h2>
+    <form th:action="@{/admin/edit-election}" method="post">
+        <input type="hidden" name="id" th:value="${election.id}" />
+        <div>
+            <label for="name">Election Name:</label>
+            <input type="text" id="name" name="name" th:value="${election.title}" required />
+        </div>
+        <div>
+            <label for="startTime">Start Time:</label>
+            <input type="datetime-local" id="startTime" name="startTime" th:value="${#temporals.format(election.startTime, 'yyyy-MM-dd''T''HH:mm')}" required />
+        </div>
+        <div>
+            <label for="endTime">End Time:</label>
+            <input type="datetime-local" id="endTime" name="endTime" th:value="${#temporals.format(election.endTime, 'yyyy-MM-dd''T''HH:mm')}" required />
+        </div>
+        <button type="submit">Update Election</button>
+    </form>
+    <div class="bottom-links">
+        <a th:href="@{/admin/elections}">Back to Admin Dashboard</a>
+    </div>
+</div>
+</body>
+</html>

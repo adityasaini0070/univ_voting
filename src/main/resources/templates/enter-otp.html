@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>Enter OTP</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}" />
+</head>
+<body>
+<div class="container">
+    <h2>Enter OTP</h2>
+    <p class="message">An OTP has been sent to your linked Telegram account.</p>
+    <p th:if="${error}" class="error" th:text="${error}"></p>
+    <form th:action="@{/vote/verify-otp}" method="post">
+        <input type="hidden" name="electionId" th:value="${electionId}" />
+        <input type="hidden" name="candidateId" th:value="${candidateId}" />
+        <div>
+            <label for="otp">OTP:</label>
+            <input type="text" id="otp" name="otp" required autofocus />
+        </div>
+        <button type="submit">Verify and Cast Vote</button>
+    </form>
+    <div class="bottom-links">
+        <a th:href="@{/elections}">Back to Elections</a>
+    </div>
+</div>
+</body>
+</html>

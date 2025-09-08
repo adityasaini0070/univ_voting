@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8" />
+    <title>Elections</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}" />
+</head>
+<body>
+<div class="container" style="max-width: 900px;">
+    <h2>Available Elections</h2>
+    <p th:if="${message}" class="message" th:text="${message}"></p>
+    <p th:if="${error}" class="error" th:text="${error}"></p>
+
+    <div sec:authorize="hasRole('ADMIN')" style="margin-bottom: 20px;">
+        <a th:href="@{/admin/elections}" class="button">Go to Admin Dashboard</a>
+    </div>
+
+    <table>
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Start Time</th>
+            <th>End Time</th>
+            <th>Candidates</th>
+            <th>Action</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="election : ${elections}">
+            <td th:text="${election.title}"></td>
+            <td th:text="${#temporals.format(election.startTime, 'yyyy-MM-dd HH:mm')}"></td>
+            <td th:text="${#temporals.format(election.endTime, 'yyyy-MM-dd HH:mm')}"></td>
+            <td>
+                <ul style="padding-left: 20px;">
+                    <li th:each="candidate : ${candidatesMap[election.id]}" th:text="${candidate.name}"></li>
+                </ul>
+            </td>
+            <td>
+                <form th:action="@{/vote/request-otp}" method="post" th:if="${#temporals.createNow().isAfter(election.startTime) and #temporals.createNow().isBefore(election.endTime)}">
+                    <input type="hidden" name="electionId" th:value="${election.id}" />
+                    <select name="candidateId" style="margin-bottom: 10px;">
+                        <option th:each="candidate : ${candidatesMap[election.id]}"
+                                th:value="${candidate.id}"
+                                th:text="${candidate.name}"></option>
+                    </select>
+                    <button type="submit">Request OTP to Vote</button>
+                </form>
+                <span th:if="${#temporals.createNow().isBefore(election.startTime)}">Not yet started</span>
+                <span th:if="${#temporals.createNow().isAfter(election.endTime)}">Ended</span>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <div class="bottom-links">
+        <form th:action="@{/logout}" method="post">
+            <button type="submit" class="button">Logout</button>
+        </form>
+    </div>
+</div>
+</body>
+</html>
