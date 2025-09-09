@@ -20,9 +20,9 @@
         <div>
             <label for="electionId">Election:</label>
             <select id="electionId" name="electionId">
-                <option th:each="election : ${elections}"
-                        th:value="${election.id}"
-                        th:text="${election.name}"></option>
+        <option th:each="election : ${elections}"
+            th:value="${election.id}"
+            th:text="${election.title}"></option>
             </select>
         </div>
         <button type="submit">Create Candidate</button>
