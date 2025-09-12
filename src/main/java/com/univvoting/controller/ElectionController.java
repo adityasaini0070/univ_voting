@@ -1,15 +1,17 @@
 package com.univvoting.controller;
 
-import com.univvoting.repository.ElectionRepository;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import com.univvoting.repository.CandidateRepository;
-import com.univvoting.model.Candidate;
 import java.util.HashMap;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+
+import com.univvoting.model.Candidate;
+import com.univvoting.repository.CandidateRepository;
+import com.univvoting.repository.ElectionRepository;
 
 @Controller
 public class ElectionController {
