@@ -1,15 +1,32 @@
 package com.univvoting.service;
 
-import com.univvoting.model.User;
-import com.univvoting.repository.UserRepository;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import com.univvoting.model.User;
+import com.univvoting.repository.UserRepository;
 
 @Service
 public class UserService {
+
+    public boolean deleteUserByUniversityId(String universityId) {
+        return userRepository.findByUniversityId(universityId)
+                .map(u -> { userRepository.delete(u); return true; })
+                .orElse(false);
+    }
+    public boolean setRoleByUniversityId(String universityId, String newRole) {
+        Optional<User> userOpt = userRepository.findByUniversityId(universityId);
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            user.setRole(newRole);
+            userRepository.save(user);
+            return true;
+        }
+        return false;
+    }
     @Autowired
     private UserRepository userRepository;
 
