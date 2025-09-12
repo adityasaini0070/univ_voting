@@ -1,18 +1,21 @@
 package com.univvoting.controller;
 
-import com.univvoting.model.User;
-import com.univvoting.repository.UserRepository;
-import com.univvoting.service.OtpService;
-import com.univvoting.service.VoteService;
+import java.util.Optional;
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.Optional;
-import java.util.UUID;
+import com.univvoting.model.User;
+import com.univvoting.repository.UserRepository;
+import com.univvoting.service.OtpService;
+import com.univvoting.service.VoteService;
 
 @Controller
 @RequestMapping("/vote")
@@ -36,6 +39,10 @@ public class VotingController {
             return "elections";
         }
         User u = maybe.get();
+        if (!"VOTER".equalsIgnoreCase(u.getRole())) {
+            model.addAttribute("error", "You can't vote as you need a voter id to do that.");
+            return "elections";
+        }
         try {
             otpService.generateAndSendOtp(u.getId());
             model.addAttribute("message","OTP sent to your Telegram (if linked)");
@@ -58,6 +65,10 @@ public class VotingController {
             return "elections";
         }
         User u = maybe.get();
+        if (!"VOTER".equalsIgnoreCase(u.getRole())) {
+            model.addAttribute("error", "You can't vote as you need a voter id to do that.");
+            return "elections";
+        }
         boolean ok = otpService.verifyOtp(u.getId(), otp);
         if (!ok) {
             model.addAttribute("error","Invalid or expired OTP");
