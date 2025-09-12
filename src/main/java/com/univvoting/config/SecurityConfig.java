@@ -34,11 +34,11 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(AbstractHttpConfigurer::disable) // Disable CSRF for Postman testing
+                .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/register", "/login", "/error", "/webjars/**").permitAll()
                         .requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
-                        .requestMatchers("/admin/**").hasRole("ADMIN") // Secure admin routes
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated())
                 .formLogin(login -> login
                         .loginPage("/login")
@@ -47,7 +47,9 @@ public class SecurityConfig {
                         .permitAll())
                 .logout(logout -> logout
                         .logoutSuccessUrl("/login?logout=true")
-                        .permitAll());
+                        .permitAll())
+                .exceptionHandling(exception -> exception
+                        .accessDeniedPage("/accessDenied"));
         return http.build();
     }
 }
