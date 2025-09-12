@@ -36,15 +36,17 @@
                 </ul>
             </td>
             <td>
-                <form th:action="@{/vote/request-otp}" method="post" th:if="${#temporals.createNow().isAfter(election.startTime) and #temporals.createNow().isBefore(election.endTime)}">
-                    <input type="hidden" name="electionId" th:value="${election.id}" />
-                    <select name="candidateId" style="margin-bottom: 10px;">
-                        <option th:each="candidate : ${candidatesMap[election.id]}"
-                                th:value="${candidate.id}"
-                                th:text="${candidate.name}"></option>
-                    </select>
-                    <button type="submit">Request OTP to Vote</button>
-                </form>
+                <div sec:authorize="hasRole('VOTER')">
+                    <form th:action="@{/vote/request-otp}" method="post" th:if="${#temporals.createNow().isAfter(election.startTime) and #temporals.createNow().isBefore(election.endTime)}">
+                        <input type="hidden" name="electionId" th:value="${election.id}" />
+                        <select name="candidateId" style="margin-bottom: 10px;">
+                            <option th:each="candidate : ${candidatesMap[election.id]}"
+                                    th:value="${candidate.id}"
+                                    th:text="${candidate.name}"></option>
+                        </select>
+                        <button type="submit">Request OTP to Vote</button>
+                    </form>
+                </div>
                 <span th:if="${#temporals.createNow().isBefore(election.startTime)}">Not yet started</span>
                 <span th:if="${#temporals.createNow().isAfter(election.endTime)}">Ended</span>
             </td>
