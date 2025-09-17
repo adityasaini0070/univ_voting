@@ -61,7 +61,8 @@
             </td>
             <td>
                 <div sec:authorize="hasRole('VOTER')">
-                    <form th:action="@{/vote/select-candidate}" method="post" th:if="${#temporals.createNow().isAfter(election.startTimeLocal) and #temporals.createNow().isBefore(election.endTimeLocal)}">
+                    <form th:action="@{/vote/select-candidate}" method="post"
+                          th:if="${#temporals.createNow().isAfter(election.startTimeLocal)} and ${#temporals.createNow().isBefore(election.endTimeLocal)}">
                         <input type="hidden" name="electionId" th:value="${election.id}" />
                         <select name="candidateId" style="margin-bottom: 10px;">
                             <option th:each="candidate : ${candidatesMap[election.id]}"
@@ -71,8 +72,15 @@
                         <button type="submit">Request OTP to Vote</button>
                     </form>
                 </div>
-                <span th:if="${#temporals.createNow().isBefore(election.endTimeLocal)}">Not yet started</span>
-                <span th:if="${#temporals.createNow().isAfter(election.startTimeLocal) }">Ended</span>
+                <span th:if="${#temporals.createNow().isBefore(election.startTimeLocal)}">Not yet started</span>
+                <span th:if="${#temporals.createNow().isAfter(election.endTimeLocal)}">Ended</span>
+                <div sec:authorize="hasRole('ADMIN')" style="margin-top:8px;">
+                    <a th:href="@{'/admin/edit-election?id=' + ${election.id}}" class="button" style="margin-right:5px;">Edit</a>
+                    <form th:action="@{'/admin/delete-election'}" method="post" style="display:inline;">
+                        <input type="hidden" name="id" th:value="${election.id}" />
+                        <button type="submit" class="button" style="background:#e74c3c; color:white;">Delete</button>
+                    </form>
+                </div>
             </td>
         </tr>
         </tbody>
