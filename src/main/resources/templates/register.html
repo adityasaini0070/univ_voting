@@ -4,8 +4,33 @@
     <meta charset="UTF-8" />
     <title>Register</title>
     <link rel="stylesheet" th:href="@{/css/styles.css}" />
+    <style>
+        .navbar {
+            background: blue;
+            color: #fff;
+            padding: 10px 0;
+            margin-bottom: 30px;
+        }
+        .navbar a {
+            color: blue;
+            text-decoration: none;
+            margin: 0 15px;
+            font-weight: 500;
+        }
+        .navbar a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
+<div class="navbar">
+    <div class="container" style="border:none; padding:0; max-width:900px;">
+        <a th:href="@{/elections}">Elections</a>
+        <a th:href="@{/profile}">Profile</a>
+        <a th:href="@{/login}">Login</a>
+        <a th:href="@{/register}">Register</a>
+    </div>
+</div>
 <div class="container">
     <h2>Register</h2>
     <form th:action="@{/register}" method="post">

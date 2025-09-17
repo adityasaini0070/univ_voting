@@ -1,91 +1,93 @@
 package com.univvoting.service;
 
-import java.util.Optional;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-import org.telegram.telegrambots.bots.TelegramLongPollingBot;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.objects.Message;
-import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-
 import com.univvoting.model.TelegramLink;
 import com.univvoting.model.User;
+import com.univvoting.repository.TelegramLinkRepository;
 import com.univvoting.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.api.objects.Message;
+import org.telegram.telegrambots.meta.api.objects.Update;
 
-@Component
+import java.util.Optional;
+import java.util.UUID;
+
+@Service
 public class TelegramBotService extends TelegramLongPollingBot {
-    private static final Logger log = LoggerFactory.getLogger(TelegramBotService.class);
 
-    private final TelegramLinkService linkService;
-    private final UserRepository userRepository;
+    @Autowired
+    private TelegramLinkRepository linkRepo;
 
-    private final String botToken;
-    private final String botUsername;
+    @Autowired
+    private UserRepository userRepo;
 
-    public TelegramBotService(
-            TelegramLinkService linkService,
-            UserRepository userRepository,
-            @Value("${telegram.bot.token}") String botToken,
-            @Value("${telegram.bot.username:}") String botUsername) {
-        super(botToken);
-        this.linkService = linkService;
-        this.userRepository = userRepository;
-        this.botToken = botToken;
-        this.botUsername = botUsername;
-    }
+     @Value("${telegram.bot.username}")
+    private String botUsername;
 
+    @Value("${telegram.bot.token}")
+    private String botToken;
+
+    
     @Override
     public void onUpdateReceived(Update update) {
         if (!update.hasMessage()) return;
         Message msg = update.getMessage();
-        if (msg.hasText()) {
-            String text = msg.getText().trim();
-            Long chatId = msg.getChatId();
-            log.info("Received telegram message from {}: {}", chatId, text);
-            if (text.startsWith("/start")) {
-                String[] parts = text.split("\s+");
-                if (parts.length >= 2) {
-                    String token = parts[1].trim();
-                    Optional<TelegramLink> maybe = linkService.findByToken(token);
-                    if (maybe.isPresent()) {
-                        TelegramLink tl = maybe.get();
-                        // link chat id to user
-                        Optional<User> uopt = userRepository.findById(tl.getUserId());
-                        if (uopt.isPresent()) {
-                            User u = uopt.get();
-                            u.setTelegramChatId(chatId);
-                            userRepository.save(u);
-                            linkService.delete(tl);
-                            sendMsg(chatId, "Your Telegram has been linked to your university account.");
-                            return;
-                        }
-                    }
-                    sendMsg(chatId, "Invalid or expired link token. Please request a new link from the web app.");
-                } else {
-                    sendMsg(chatId, "Please provide the token: /start <token>");
-                }
+        if (!msg.hasText()) return;
+
+        String text = msg.getText().trim();
+        Long chatId = msg.getChatId();
+
+        // user sends: /start <token>
+        if (text.startsWith("/start")) {
+            String[] parts = text.split(" ");
+            if (parts.length < 2) {
+                sendMessage(chatId, "Please provide a valid token.");
+                return;
             }
+            String token = parts[1];
+            Optional<TelegramLink> linkOpt = linkRepo.findByToken(token);
+            if (linkOpt.isEmpty()) {
+                sendMessage(chatId, "Invalid or expired token.");
+                return;
+            }
+
+            TelegramLink link = linkOpt.get();
+            UUID userId = link.getUserId();
+
+            User u = userRepo.findById(userId).orElse(null);
+            if (u == null) {
+                sendMessage(chatId, "User not found.");
+                return;
+            }
+
+            u.setTelegramChatId(chatId);
+            userRepo.save(u);
+
+            // delete token after use
+            linkRepo.delete(link);
+
+            sendMessage(chatId, " Telegram successfully linked to your account!");
         }
     }
 
-    private void sendMsg(Long chatId, String text) {
-        SendMessage sm = new SendMessage();
-        sm.setChatId(chatId.toString());
-        sm.setText(text);
+    private void sendMessage(Long chatId, String text) {
         try {
-            execute(sm);
-        } catch (TelegramApiException e) {
-            log.error("Failed to send telegram message", e);
+            execute(new org.telegram.telegrambots.meta.api.methods.send.SendMessage(
+                    chatId.toString(), text));
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
     @Override
-    public String getBotUsername() { return botUsername == null ? "UnivVotingBot" : botUsername; }
+    public String getBotUsername() {
+        return "univvote_bot"; 
+    }
 
     @Override
-    public String getBotToken() { return botToken; }
+    public String getBotToken() {
+        return "8080890392:AAE-SKLrxks2TTrpo7vDYFQulYjweASPeX4"; 
+    }
 }

@@ -2,8 +2,11 @@ package com.univvoting.controller;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.UUID;
+import java.util.*;
 
+import com.univvoting.model.Candidate;
+import com.univvoting.model.Election;
+import com.univvoting.repository.CandidateRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -36,8 +39,8 @@ public class AdminController {
     @PostMapping("/edit-election")
     public String editElection(@RequestParam UUID id,
                               @RequestParam String name,
-                              @RequestParam("startTime") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startTime,
-                              @RequestParam("endTime") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endTime,
+                              @RequestParam("startTime") @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm") LocalDateTime startTime,
+                              @RequestParam("endTime") @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm") LocalDateTime endTime,
                               Model model) {
         try {
             var startInstant = startTime.atZone(ZoneId.systemDefault()).toInstant();
@@ -63,18 +66,48 @@ public class AdminController {
 
     @Autowired
     private AdminService adminService;
+    @Autowired
+    private CandidateRepository candidateRepository;
 
     @Autowired
     private ElectionRepository electionRepository;
 
     @GetMapping
     public String adminHome() {
-        return "redirect:/admin/elections";
+        return "admin/dashboard";
     }
 
+    // In AdminController.java
     @GetMapping("/elections")
     public String elections(Model model) {
-        model.addAttribute("elections", adminService.getAllElections());
+        // Get the original list of Election objects
+        List<Election> elections = adminService.getAllElections();
+
+        // Prepare a list of maps for Thymeleaf compatibility
+        List<Map<String, Object>> electionViews = new ArrayList<>();
+        for (Election election : elections) {
+            Map<String, Object> view = new HashMap<>();
+            view.put("id", election.getId());
+            view.put("title", election.getTitle());
+            view.put("startTime", election.getStartTime());
+            view.put("endTime", election.getEndTime());
+            view.put("startTimeLocal", election.getStartTime() != null ? java.time.LocalDateTime.ofInstant(election.getStartTime(), java.time.ZoneId.systemDefault()) : null);
+            view.put("endTimeLocal", election.getEndTime() != null ? java.time.LocalDateTime.ofInstant(election.getEndTime(), java.time.ZoneId.systemDefault()) : null);
+            electionViews.add(view);
+        }
+
+        // Create the map for candidates, always non-null
+        var candidatesMap = new HashMap<UUID, List<Candidate>>();
+        for (var election : elections) {
+            List<Candidate> candidates = candidateRepository.findByElectionId(election.getId());
+            if (candidates == null) candidates = new ArrayList<>();
+            candidatesMap.put(election.getId(), candidates);
+        }
+
+        // Add the new electionViews list and the map to the model
+        model.addAttribute("elections", electionViews);
+        model.addAttribute("candidatesMap", candidatesMap);
+
         return "admin/elections";
     }
 
@@ -85,8 +118,8 @@ public class AdminController {
 
     @PostMapping("/create-election")
     public String createElection(@RequestParam String name,
-                                 @RequestParam("startTime") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startTime,
-                                 @RequestParam("endTime") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endTime,
+                                 @RequestParam("startTime") @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm") LocalDateTime startTime,
+                                 @RequestParam("endTime") @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm") LocalDateTime endTime,
                                  Model model) {
         try {
             // Convert LocalDateTime to Instant using system default zone

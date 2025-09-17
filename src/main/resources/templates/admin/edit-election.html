@@ -4,10 +4,37 @@
     <meta charset="UTF-8" />
     <title>Edit Election</title>
     <link rel="stylesheet" th:href="@{/css/styles.css}" />
+    <style>
+        .navbar {
+            background: blue;
+            color: #fff;
+            padding: 10px 0;
+            margin-bottom: 30px;
+        }
+        .navbar a {
+            color: blue;
+            text-decoration: none;
+            margin: 0 15px;
+            font-weight: 500;
+        }
+        .navbar a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
+<div class="navbar">
+    <div class="container" style="border:none; padding:0; max-width:900px;">
+        <a th:href="@{/elections}">Elections</a>
+        <a th:href="@{/profile}">Profile</a>
+        <a th:href="@{/admin/elections}">Admin Dashboard</a>
+        <a th:href="@{/logout}">Logout</a>
+    </div>
+</div>
 <div class="container">
     <h2>Edit Election</h2>
+    <p th:if="${message}" class="message" th:text="${message}"></p>
+    <p th:if="${error}" class="error" th:text="${error}"></p>
     <form th:action="@{/admin/edit-election}" method="post">
         <input type="hidden" name="id" th:value="${election.id}" />
         <div>
@@ -25,7 +52,9 @@
         <button type="submit">Update Election</button>
     </form>
     <div class="bottom-links">
-        <a th:href="@{/admin/elections}">Back to Admin Dashboard</a>
+        <a th:href="@{/admin/elections}" class="button">Back to Admin Dashboard</a>
+        <a th:href="@{/admin/create-candidate}" class="button">Create Candidate</a>
+        <a th:href="@{/admin/create-election}" class="button">Create Election</a>
     </div>
 </div>
 </body>

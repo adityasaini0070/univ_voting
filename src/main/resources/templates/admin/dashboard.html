@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8" />
-    <title>Access Denied</title>
+    <title>Admin Dashboard</title>
     <link rel="stylesheet" th:href="@{/css/styles.css}" />
     <style>
         .navbar {
@@ -20,6 +20,12 @@
         .navbar a:hover {
             text-decoration: underline;
         }
+        .dashboard-buttons {
+            margin-bottom: 30px;
+        }
+        .dashboard-buttons a {
+            margin-right: 15px;
+        }
     </style>
 </head>
 <body>
@@ -30,10 +36,14 @@
         <a th:href="@{/logout}">Logout</a>
     </div>
 </div>
-<div class="container" style="max-width: 600px; margin-top: 50px;">
-    <h2>Access Denied</h2>
-    <p>You do not have permission to access this page.</p>
-    <a th:href="@{/elections}" class="button">Back to Elections</a>
+<div class="container" style="max-width: 900px;">
+    <h2>Admin Dashboard</h2>
+    <div class="dashboard-buttons">
+        <a th:href="@{/admin/create-election}" class="button">Add Election</a>
+        <a th:href="@{/admin/create-candidate}" class="button">Add Candidate</a>
+        <a th:href="@{/admin/elections}" class="button">View All Elections</a>
+    </div>
+    <p>Welcome to the admin dashboard. Use the buttons above to manage elections and candidates.</p>
 </div>
 </body>
 </html>

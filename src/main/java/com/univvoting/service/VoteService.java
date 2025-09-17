@@ -41,4 +41,7 @@ public class VoteService {
 
         ballotBoxRepository.save(b);
     }
+    public boolean hasUserVoted(UUID electionId, UUID userId) {
+        return voteLedgerRepository.findByElectionIdAndUserId(electionId, userId).isPresent();
+    }
 }

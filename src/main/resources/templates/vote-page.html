@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Vote - <span th:text="${election.title}"></span></title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<div class="navbar">
+    <div class="container" style="border:none; padding:0; max-width:900px;">
+        <a th:href="@{/elections}">Elections</a>
+        <a th:href="@{/profile}">Profile</a>
+        <a th:href="@{/admin/elections}" sec:authorize="hasRole('ADMIN')">Admin Dashboard</a>
+        <a th:href="@{/logout}">Logout</a>
+    </div>
+</div>
+
+<div class="container">
+    <h2>Vote for: <span th:text="${election.title}"></span></h2>
+
+    <form th:action="@{/vote/select-candidate}" method="post">
+        <input type="hidden" name="electionId" th:value="${election.id}">
+
+        <h3>Select Candidate:</h3>
+        <div th:each="candidate : ${candidates}" style="margin: 15px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px;">
+            <input type="radio" name="candidateId" th:value="${candidate.id}" required
+                   id="${'candidate_' + candidate.id}">
+            <label th:for="${'candidate_' + candidate.id}" style="font-weight: bold; margin-left: 10px;">
+                <span th:text="${candidate.name}"></span>
+            </label>
+            <p th:text="${candidate.manifesto}" style="margin: 5px 0 0 25px; color: #666;"></p>
+        </div>
+
+        <button type="submit" class="button">Vote for Selected Candidate</button>
+    </form>
+
+    <div class="bottom-links">
+        <a th:href="@{/elections}">Back to Elections</a>
+    </div>
+</div>
+</body>
+</html>

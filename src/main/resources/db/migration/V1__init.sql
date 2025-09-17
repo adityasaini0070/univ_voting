@@ -59,7 +59,7 @@ CREATE TABLE otp_attempts (
   otp_hash text,
   expires_at timestamp,
   attempts int DEFAULT 0,
-  ip_address inet,
+  ip_address text,
   created_at timestamp DEFAULT now(),
   verified_at timestamp
 );

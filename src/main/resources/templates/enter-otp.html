@@ -4,8 +4,33 @@
     <meta charset="UTF-8" />
     <title>Enter OTP</title>
     <link rel="stylesheet" th:href="@{/css/styles.css}" />
+    <style>
+        .navbar {
+            background: blue;
+            color: #fff;
+            padding: 10px 0;
+            margin-bottom: 30px;
+        }
+        .navbar a {
+            color: blue;
+            text-decoration: none;
+            margin: 0 15px;
+            font-weight: 500;
+        }
+        .navbar a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
+<div class="navbar">
+    <div class="container" style="border:none; padding:0; max-width:900px;">
+        <a th:href="@{/elections}">Elections</a>
+        <a th:href="@{/profile}">Profile</a>
+        <a th:href="@{/admin/elections}" sec:authorize="hasRole('ADMIN')">Admin Dashboard</a>
+        <a th:href="@{/logout}">Logout</a>
+    </div>
+</div>
 <div class="container">
     <h2>Enter OTP</h2>
     <p class="message">An OTP has been sent to your linked Telegram account.</p>

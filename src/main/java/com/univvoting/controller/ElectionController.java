@@ -3,6 +3,7 @@ package com.univvoting.controller;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.HashMap;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import com.univvoting.model.Candidate;
 import com.univvoting.repository.CandidateRepository;
 import com.univvoting.repository.ElectionRepository;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 public class ElectionController {
@@ -22,7 +24,18 @@ public class ElectionController {
 
     @Autowired
     private CandidateRepository candidateRepository;
+    @GetMapping("/elections/vote")
+    public String votePage(@RequestParam UUID electionId, Model model) {
+        var election = electionRepository.findById(electionId).orElse(null);
+        if (election == null) {
+            return "redirect:/elections";
+        }
 
+        var candidates = candidateRepository.findByElectionId(electionId);
+        model.addAttribute("election", election);
+        model.addAttribute("candidates", candidates);
+        return "vote-page";
+    }
     @GetMapping("/elections")
     public String listElections(Model model) {
         var elections = electionRepository.findAll();

@@ -4,8 +4,32 @@
     <meta charset="UTF-8" />
     <title>Elections</title>
     <link rel="stylesheet" th:href="@{/css/styles.css}" />
+    <style>
+        .navbar {
+            background: blue;
+            color: #fff;
+            padding: 10px 0;
+            margin-bottom: 30px;
+        }
+        .navbar a {
+            color: blue;
+            text-decoration: none;
+            margin: 0 15px;
+            font-weight: 500;
+        }
+        .navbar a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
+<div class="navbar">
+    <div class="container" style="border:none; padding:0; max-width:900px;">
+        <a th:href="@{/elections}">Elections</a>
+        <a th:href="@{/profile}">Profile</a>
+        <a th:href="@{/logout}">Logout</a>
+    </div>
+</div>
 <div class="container" style="max-width: 900px;">
     <h2>Available Elections</h2>
     <p th:if="${message}" class="message" th:text="${message}"></p>
@@ -28,8 +52,8 @@
         <tbody>
         <tr th:each="election : ${elections}">
             <td th:text="${election.title}"></td>
-            <td th:text="${#temporals.format(election.startTime, 'yyyy-MM-dd HH:mm')}"></td>
-            <td th:text="${#temporals.format(election.endTime, 'yyyy-MM-dd HH:mm')}"></td>
+            <td th:text="${election.startTime != null ? #temporals.format(election.startTime, 'yyyy-MM-dd HH:mm') : 'N/A'}"></td>
+            <td th:text="${election.endTime != null ? #temporals.format(election.endTime, 'yyyy-MM-dd HH:mm') : 'N/A'}"></td>
             <td>
                 <ul style="padding-left: 20px;">
                     <li th:each="candidate : ${candidatesMap[election.id]}" th:text="${candidate.name}"></li>
@@ -37,7 +61,7 @@
             </td>
             <td>
                 <div sec:authorize="hasRole('VOTER')">
-                    <form th:action="@{/vote/request-otp}" method="post" th:if="${#temporals.createNow().isAfter(election.startTime) and #temporals.createNow().isBefore(election.endTime)}">
+                    <form th:action="@{/vote/select-candidate}" method="post" th:if="${#temporals.createNow().isAfter(election.startTime) and #temporals.createNow().isBefore(election.endTime)}">
                         <input type="hidden" name="electionId" th:value="${election.id}" />
                         <select name="candidateId" style="margin-bottom: 10px;">
                             <option th:each="candidate : ${candidatesMap[election.id]}"
