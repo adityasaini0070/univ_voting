@@ -77,13 +77,13 @@ public class AdminController {
         return "admin/dashboard";
     }
 
-    // In AdminController.java
+   
     @GetMapping("/elections")
     public String elections(Model model) {
-        // Get the original list of Election objects
+        
         List<Election> elections = adminService.getAllElections();
 
-        // Prepare a list of maps for Thymeleaf compatibility
+        
         List<Map<String, Object>> electionViews = new ArrayList<>();
         for (Election election : elections) {
             Map<String, Object> view = new HashMap<>();
@@ -96,7 +96,6 @@ public class AdminController {
             electionViews.add(view);
         }
 
-        // Create the map for candidates, always non-null
         var candidatesMap = new HashMap<UUID, List<Candidate>>();
         for (var election : elections) {
             List<Candidate> candidates = candidateRepository.findByElectionId(election.getId());
@@ -104,7 +103,6 @@ public class AdminController {
             candidatesMap.put(election.getId(), candidates);
         }
 
-        // Add the new electionViews list and the map to the model
         model.addAttribute("elections", electionViews);
         model.addAttribute("candidatesMap", candidatesMap);
 
@@ -122,7 +120,7 @@ public class AdminController {
                                  @RequestParam("endTime") @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm") LocalDateTime endTime,
                                  Model model) {
         try {
-            // Convert LocalDateTime to Instant using system default zone
+            
             var startInstant = startTime.atZone(ZoneId.systemDefault()).toInstant();
             var endInstant = endTime.atZone(ZoneId.systemDefault()).toInstant();
             adminService.createElection(name, startInstant, endInstant);
