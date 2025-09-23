@@ -1,18 +1,20 @@
 package com.univvoting.service;
 
-import com.univvoting.model.TelegramLink;
-import com.univvoting.model.User;
-import com.univvoting.repository.TelegramLinkRepository;
-import com.univvoting.repository.UserRepository;
+import java.util.Optional;
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
-import java.util.Optional;
-import java.util.UUID;
+import com.univvoting.model.TelegramLink;
+import com.univvoting.model.User;
+import com.univvoting.repository.TelegramLinkRepository;
+import com.univvoting.repository.UserRepository;
 
 @Service
 public class TelegramBotService extends TelegramLongPollingBot {
@@ -23,11 +25,15 @@ public class TelegramBotService extends TelegramLongPollingBot {
     @Autowired
     private UserRepository userRepo;
 
-     @Value("${telegram.bot.username}")
+    @Value("${telegram.bot.username}")
     private String botUsername;
 
     @Value("${telegram.bot.token}")
     private String botToken;
+    
+    public TelegramBotService(@Value("${telegram.bot.token}") String botToken) {
+        super(botToken);
+    }
 
     
     @Override
@@ -74,8 +80,10 @@ public class TelegramBotService extends TelegramLongPollingBot {
 
     private void sendMessage(Long chatId, String text) {
         try {
-            execute(new org.telegram.telegrambots.meta.api.methods.send.SendMessage(
-                    chatId.toString(), text));
+            SendMessage message = new SendMessage();
+            message.setChatId(chatId.toString());
+            message.setText(text);
+            execute(message);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -83,11 +91,8 @@ public class TelegramBotService extends TelegramLongPollingBot {
 
     @Override
     public String getBotUsername() {
-        return "univvote_bot"; 
+        return botUsername;
     }
-
-    @Override
-    public String getBotToken() {
-        return "8080890392:AAE-SKLrxks2TTrpo7vDYFQulYjweASPeX4"; 
-    }
+    
+    // getBotToken is already inherited from TelegramLongPollingBot with the new constructor
 }

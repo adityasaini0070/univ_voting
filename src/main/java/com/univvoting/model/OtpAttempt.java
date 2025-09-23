@@ -36,7 +36,6 @@ public class OtpAttempt {
     @Column(name = "verified_at")
     private Instant verifiedAt;
 
-    // getters & setters
     public UUID getId() { return id; }
     public void setId(UUID id) { this.id = id; }
     public UUID getUserId() { return userId; }
