@@ -3,10 +3,7 @@ package com.univvoting.model;
 import java.time.Instant;
 import java.util.UUID;
 
-import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Column;
-import jakarta.persistence.Convert;
-import jakarta.persistence.Converter;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -30,8 +27,7 @@ public class OtpAttempt {
 
     private int attempts = 0;
 
-    @Column(name = "ip_address", columnDefinition = "inet")
-    @Convert(converter = InetConverter.class)
+    @Column(name = "ip_address")
     private String ipAddress;
 
     @Column(name = "created_at")
@@ -53,18 +49,7 @@ public class OtpAttempt {
     public String getIpAddress() { return ipAddress; }
     public void setIpAddress(String ipAddress) { this.ipAddress = ipAddress; }
 
-    // Converter for PostgreSQL inet type
-    @Converter
-    public static class InetConverter implements AttributeConverter<String, String> {
-        @Override
-        public String convertToDatabaseColumn(String attribute) {
-            return attribute; // Should be a valid IPv4/IPv6 string
-        }
-        @Override
-        public String convertToEntityAttribute(String dbData) {
-            return dbData;
-        }
-    }
+
     public Instant getCreatedAt() { return createdAt; }
     public void setCreatedAt(Instant createdAt) { this.createdAt = createdAt; }
     public Instant getVerifiedAt() { return verifiedAt; }
