@@ -1,12 +1,13 @@
 package com.univvoting.controller;
 
-import com.univvoting.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import com.univvoting.service.UserService;
 
 @Controller
 public class AuthController {
@@ -24,7 +25,8 @@ public class AuthController {
                            @RequestParam(required = false) String phoneNumber,
                            Model model) {
         try {
-            userService.register(universityId, fullName, role, password, phoneNumber);
+            // Force the role to be VOTER regardless of what's submitted
+            userService.register(universityId, fullName, "VOTER", password, phoneNumber);
             model.addAttribute("message","Registration successful. Please login.");
             return "login";
         } catch (Exception ex) {
