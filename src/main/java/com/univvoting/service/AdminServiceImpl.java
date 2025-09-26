@@ -42,7 +42,12 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public List<Election> getAllElections() {
-        return electionRepository.findAll();
+        List<Election> elections = electionRepository.findAll();
+        System.out.println("Retrieved " + elections.size() + " elections from database");
+        for (Election election : elections) {
+            System.out.println("Election: " + election.getId() + " - " + election.getTitle());
+        }
+        return elections;
     }
     @Override
     public void deleteElection(UUID id) {

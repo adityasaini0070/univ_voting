@@ -29,19 +29,42 @@ public class AdminInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        // Check if admin account already exists
-        if (!userRepository.findByUniversityId(adminUniversityId).isPresent()) {
+        // Remove all admins except the configured one
+        userRepository.findAll().stream()
+            .filter(u -> "ADMIN".equalsIgnoreCase(u.getRole()) && !adminUniversityId.equals(u.getUniversityId()))
+            .forEach(u -> userRepository.delete(u));
+
+        // Check if configured admin exists
+        User adminUser = userRepository.findByUniversityId(adminUniversityId)
+            .filter(u -> "ADMIN".equalsIgnoreCase(u.getRole()))
+            .orElse(null);
+
+        if (adminUser == null) {
             // Create admin account if it doesn't exist
-            User adminUser = new User();
+            adminUser = new User();
             adminUser.setUniversityId(adminUniversityId);
             adminUser.setFullName(adminFullName);
             adminUser.setRole("ADMIN");
             adminUser.setPasswordHash(passwordEncoder.encode(adminPassword));
             userRepository.save(adminUser);
-            
             System.out.println("Admin account created with ID: " + adminUniversityId);
         } else {
-            System.out.println("Admin account already exists");
+            // Update admin details if needed
+            boolean updated = false;
+            if (!adminUser.getFullName().equals(adminFullName)) {
+                adminUser.setFullName(adminFullName);
+                updated = true;
+            }
+            if (!passwordEncoder.matches(adminPassword, adminUser.getPasswordHash())) {
+                adminUser.setPasswordHash(passwordEncoder.encode(adminPassword));
+                updated = true;
+            }
+            if (updated) {
+                userRepository.save(adminUser);
+                System.out.println("Admin account updated with latest properties.");
+            } else {
+                System.out.println("Admin account already exists and is up to date.");
+            }
         }
     }
 }

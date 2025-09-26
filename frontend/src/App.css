@@ -1,0 +1,61 @@
+/* App specific styles */
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app .container {
+  flex: 1;
+}
+
+/* Button styles */
+.btn-link {
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-decoration: underline;
+  display: inline;
+  margin: 0;
+  padding: 0;
+  color: #0d6efd;
+}
+
+.btn-link:hover {
+  color: #0a58ca;
+}
+
+/* Loading container */
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  font-size: 1.5rem;
+  color: #0d6efd;
+}
+
+/* Flexbox helper classes */
+.d-flex {
+  display: flex;
+}
+
+.justify-content-between {
+  justify-content: space-between;
+}
+
+.align-items-center {
+  align-items: center;
+}
+
+/* Admin dashboard specific styles */
+.admin-nav {
+  margin-bottom: 1rem;
+}
+
+.stat-value {
+  font-weight: bold;
+  color: #0d6efd;
+}
+
+/* Specific page styles can be added here as needed */
