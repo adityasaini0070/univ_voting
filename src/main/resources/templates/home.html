@@ -1,39 +1,107 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <title>University Voting System</title>
     <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
-<div class="navbar">
-    <div class="container" style="border:none; padding:0; max-width:900px;">
-        <a th:href="@{/}">Home</a>
-        <a th:href="@{/elections}">Elections</a>
-        <a th:href="@{/admin/elections}" sec:authorize="hasRole('ADMIN')">Admin Dashboard</a>
-        <a th:href="@{/login}">Login</a>
-        <a th:href="@{/register}">Register</a>
-    </div>
-</div>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="/" class="navbar-brand">🗳️ University Voting</a>
+            <ul class="navbar-nav">
+                <li><a th:href="@{/}" class="nav-link active">Home</a></li>
+                <li><a th:href="@{/elections}" class="nav-link">Elections</a></li>
+                <li><a th:href="@{/results}" class="nav-link">Results</a></li>
+                <li sec:authorize="hasRole('ADMIN')">
+                    <a th:href="@{/admin}" class="nav-link">Admin</a>
+                </li>
+                <li sec:authorize="!isAuthenticated()">
+                    <a th:href="@{/login}" class="nav-link">Login</a>
+                </li>
+                <li sec:authorize="!isAuthenticated()">
+                    <a th:href="@{/register}" class="nav-link">Register</a>
+                </li>
+                <li sec:authorize="isAuthenticated()">
+                    <a th:href="@{/profile}" class="nav-link">Profile</a>
+                </li>
+                <li sec:authorize="isAuthenticated()">
+                    <a th:href="@{/logout}" class="nav-link">Logout</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
 
-<div class="container">
-    <h1>Welcome to University Voting System</h1>
-    <p>Secure and transparent voting system for university elections</p>
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="container">
+            <h1>🗳️ University Voting System</h1>
+            <p class="text-center" style="font-size: 1.2rem; color: #6c757d; margin-bottom: 2rem;">
+                Secure and transparent voting platform for university elections
+            </p>
 
-    <div style="text-align: center; margin: 30px 0;">
-        <a th:href="@{/login}" class="button">Login to Vote</a>
-        <a th:href="@{/register}" class="button">Register Now</a>
+            <!-- Action Buttons -->
+            <div class="btn-group" sec:authorize="!isAuthenticated()">
+                <a th:href="@{/login}" class="btn btn-primary">Login to Vote</a>
+                <a th:href="@{/register}" class="btn btn-secondary">Register Now</a>
+            </div>
+
+            <div class="btn-group" sec:authorize="isAuthenticated()">
+                <a th:href="@{/elections}" class="btn btn-primary">View Elections</a>
+                <a th:href="@{/profile}" class="btn btn-secondary">My Profile</a>
+            </div>
+
+            <!-- Features Section -->
+            <div class="home-features">
+                <h3 class="text-center">System Features</h3>
+                <ul>
+                    <li>
+                        <strong>🔐 Secure Authentication</strong><br>
+                        OTP-based verification via Telegram for enhanced security
+                    </li>
+                    <li>
+                        <strong>📊 Real-time Monitoring</strong><br>
+                        Live election tracking and transparent result updates
+                    </li>
+                    <li>
+                        <strong>✨ User-friendly Interface</strong><br>
+                        Intuitive design for seamless voting experience
+                    </li>
+                    <li>
+                        <strong>🛡️ Admin Controls</strong><br>
+                        Comprehensive election management and user administration
+                    </li>
+                    
+                    <li>
+                        <strong>🔍 Transparent Process</strong><br>
+                        Open and verifiable voting with detailed audit trails
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Statistics Section (if authenticated) -->
+            <div sec:authorize="isAuthenticated()" class="stats-container">
+                <div class="stat-card">
+                    <div class="stat-number">100%</div>
+                    <div class="stat-label">Secure</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">24/7</div>
+                    <div class="stat-label">Available</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">∞</div>
+                    <div class="stat-label">Transparent</div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div style="margin-top: 40px;">
-        <h2>Features:</h2>
-        <ul>
-            <li>Secure OTP-based authentication via Telegram</li>
-            <li>Real-time election monitoring</li>
-            <li>Transparent voting process</li>
-            <li>Admin dashboard for election management</li>
-        </ul>
-    </div>
-</div>
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2025 University Voting System. Built with security and transparency in mind.</p>
+    </footer>
 </body>
 </html>

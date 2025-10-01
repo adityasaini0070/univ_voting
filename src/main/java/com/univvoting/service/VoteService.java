@@ -21,6 +21,16 @@ public class VoteService {
 
     @Transactional
     public void castVote(UUID electionId, UUID userId, UUID candidateId) {
+        if (electionId == null) {
+            throw new NullPointerException("Election ID cannot be null");
+        }
+        if (userId == null) {
+            throw new NullPointerException("User ID cannot be null");
+        }
+        if (candidateId == null) {
+            throw new NullPointerException("Candidate ID cannot be null");
+        }
+        
         // enforce one-person-one-vote at DB level (unique constraint) and check beforehand
         if (voteLedgerRepository.findByElectionIdAndUserId(electionId, userId).isPresent()) {
             throw new IllegalStateException("User already voted in this election");

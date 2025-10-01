@@ -1,5 +1,6 @@
 package com.univvoting.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -17,18 +18,36 @@ import com.univvoting.repository.UserRepository;
 @EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
 
+    @Value("${spring.security.user.name}")
+    private String adminUsername;
+
+    @Value("${spring.security.user.password}")
+    private String adminPassword;
+
     @Bean
     public PasswordEncoder passwordEncoder() { return new BCryptPasswordEncoder(); }
 
     @Bean
     public UserDetailsService userDetailsService(UserRepository repo) {
-        return username -> repo.findByUniversityId(username)
-                .map(u -> org.springframework.security.core.userdetails.User
-                        .withUsername(u.getUniversityId())
-                        .password(u.getPasswordHash())
-                        .roles(u.getRole())
-                        .build())
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        return username -> {
+            // Check if it's the predefined admin
+            if (adminUsername.equals(username)) {
+                return org.springframework.security.core.userdetails.User
+                        .withUsername(adminUsername)
+                        .password(passwordEncoder().encode(adminPassword))
+                        .roles("ADMIN")
+                        .build();
+            }
+            
+            // Otherwise, look up in database
+            return repo.findByUniversityId(username)
+                    .map(u -> org.springframework.security.core.userdetails.User
+                            .withUsername(u.getUniversityId())
+                            .password(u.getPasswordHash())
+                            .roles(u.getRole())
+                            .build())
+                    .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        };
     }
 
     @Bean

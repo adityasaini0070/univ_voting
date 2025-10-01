@@ -19,12 +19,11 @@ public class AuthController {
     @PostMapping("/register")
     public String register(@RequestParam String universityId,
                            @RequestParam String fullName,
-                           @RequestParam String role,
                            @RequestParam String password,
                            @RequestParam(required = false) String phoneNumber,
                            Model model) {
         try {
-            userService.register(universityId, fullName, role, password, phoneNumber);
+            userService.register(universityId, fullName, "VOTER", password, phoneNumber);
             model.addAttribute("message","Registration successful. Please login.");
             return "login";
         } catch (Exception ex) {

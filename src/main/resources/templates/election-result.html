@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="'Results - ' + ${electionResult.electionTitle}">Election Results</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <style>
+        .result-container {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            margin: 20px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .result-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid black;
+        }
+        .election-title {
+            font-size: 2em;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .total-votes-display {
+            font-size: 1.2em;
+            color: #6c757d;
+        }
+        .candidate-result {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 8px;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
+        .candidate-result:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .candidate-result.winner {
+            border-color: #28a745;
+            background: linear-gradient(135deg, #d4edda, #f8f9fa);
+        }
+        .candidate-info {
+            flex: 1;
+            margin-right: 20px;
+        }
+        .candidate-name {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        .candidate-manifesto {
+            color: #6c757d;
+            font-size: 0.95em;
+            line-height: 1.4;
+        }
+        .vote-display {
+            text-align: center;
+            min-width: 120px;
+        }
+        .vote-count {
+            font-size: 2em;
+            font-weight: bold;
+            color: #007bff;
+            display: block;
+        }
+        .vote-label {
+            font-size: 0.9em;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .winner-badge {
+            background: #28a745;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 25px;
+            font-weight: bold;
+            font-size: 0.9em;
+            margin-left: 15px;
+            box-shadow: 0 2px 4px rgba(40, 167, 69, 0.3);
+        }
+        .no-results {
+            text-align: center;
+            padding: 60px;
+            color: #6c757d;
+        }
+        .no-results i {
+            font-size: 3em;
+            margin-bottom: 20px;
+            display: block;
+        }
+        .percentage {
+            font-size: 0.9em;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+        .results-summary {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="/" class="navbar-brand">🗳️ University Voting</a>
+            <ul class="navbar-nav">
+                <li><a th:href="@{/}" class="nav-link">Home</a></li>
+                <li><a th:href="@{/elections}" class="nav-link">Elections</a></li>
+                <li><a th:href="@{/results}" class="nav-link active">Results</a></li>
+                <li sec:authorize="hasRole('ADMIN')">
+                    <a th:href="@{/admin}" class="nav-link">Admin</a>
+                </li>
+                <li sec:authorize="!isAuthenticated()">
+                    <a th:href="@{/login}" class="nav-link">Login</a>
+                </li>
+                <li sec:authorize="!isAuthenticated()">
+                    <a th:href="@{/register}" class="nav-link">Register</a>
+                </li>
+                <li sec:authorize="isAuthenticated()">
+                    <a th:href="@{/profile}" class="nav-link">Profile</a>
+                </li>
+                <li sec:authorize="isAuthenticated()">
+                    <a th:href="@{/logout}" class="nav-link">Logout</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="container">
+    <div class="result-container">
+        <div class="result-header">
+            <h1 class="election-title" th:text="${electionResult.electionTitle}">Election Title</h1>
+            <div class="total-votes-display" th:text="'Total Votes Cast: ' + ${electionResult.totalVotes}">Total Votes: 0</div>
+        </div>
+
+        <div th:if="${!electionResult.hasResults}" class="no-results">
+            <i>📊</i>
+            <h3>No Votes Cast</h3>
+            <p>This election has not received any votes yet.</p>
+        </div>
+
+        <div th:if="${electionResult.hasResults}">
+            <div class="results-summary">
+                <h3>Election Summary</h3>
+                <p th:text="'Total of ' + ${electionResult.totalVotes} + ' votes were cast across ' + ${#lists.size(electionResult.candidateResults)} + ' candidates'">
+                    Election summary
+                </p>
+            </div>
+
+            <div th:each="candidate : ${electionResult.candidateResults}" 
+                 th:class="'candidate-result' + (${candidate.winner} ? ' winner' : '')">
+                
+                <div class="candidate-info">
+                    <div class="candidate-name" th:text="${candidate.candidateName}">Candidate Name</div>
+                    <div class="candidate-manifesto" th:text="${candidate.manifesto}">Candidate manifesto</div>
+                    <div class="percentage" th:if="${electionResult.totalVotes > 0}" 
+                         th:text="'(' + ${#numbers.formatDecimal((candidate.voteCount * 100.0) / electionResult.totalVotes, 1, 1)} + '%)'">
+                        (0.0%)
+                    </div>
+                </div>
+                
+                <div class="vote-display">
+                    <span class="vote-count" th:text="${candidate.voteCount}">0</span>
+                    <span class="vote-label" th:text="${candidate.voteCount == 1} ? 'Vote' : 'Votes'">Votes</span>
+                </div>
+                
+                <div th:if="${candidate.winner}" class="winner-badge">
+                    🏆 WINNER
+                </div>
+            </div>
+            </div>
+        </div>
+
+        <div class="bottom-links">
+            <a th:href="@{/results}" class="button">Back to All Results</a>
+            <a th:href="@{/elections}" class="button">Back to Elections</a>
+        </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,61 +1,68 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <title>User Profile</title>
     <link rel="stylesheet" th:href="@{/css/styles.css}" />
-    <style>
-        .navbar {
-            background: blue;
-            color: #fff;
-            padding: 10px 0;
-            margin-bottom: 30px;
-        }
-        .navbar a {
-            color: blue;
-            text-decoration: none;
-            margin: 0 15px;
-            font-weight: 500;
-        }
-        .navbar a:hover {
-            text-decoration: underline;
-        }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 
 <body>
-<div class="navbar">
-    <div class="container" style="border:none; padding:0; max-width:900px;">
-        <a th:href="@{/elections}">Elections</a>
-        <a th:href="@{/admin/elections}" sec:authorize="hasRole('ADMIN')">Admin Dashboard</a>
-        <a th:href="@{/profile}">Profile</a>
-        <a th:href="@{/logout}">Logout</a>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="/" class="navbar-brand">🗳️ University Voting</a>
+            <ul class="navbar-nav">
+                <li><a th:href="@{/}" class="nav-link">Home</a></li>
+                <li><a th:href="@{/elections}" class="nav-link">Elections</a></li>
+                <li><a th:href="@{/results}" class="nav-link">Results</a></li>
+                <li sec:authorize="hasRole('ADMIN')">
+                    <a th:href="@{/admin}" class="nav-link">Admin</a>
+                </li>
+                <li sec:authorize="!isAuthenticated()">
+                    <a th:href="@{/login}" class="nav-link">Login</a>
+                </li>
+                <li sec:authorize="!isAuthenticated()">
+                    <a th:href="@{/register}" class="nav-link">Register</a>
+                </li>
+                <li sec:authorize="isAuthenticated()">
+                    <a th:href="@{/profile}" class="nav-link active">Profile</a>
+                </li>
+                <li sec:authorize="isAuthenticated()">
+                    <a th:href="@{/logout}" class="nav-link">Logout</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="container">
+            <h2>Your Profile</h2>
+            <p>Link your Telegram account to receive OTPs for voting.</p>
+
+
+            <div th:if="${telegramLinked}" class="alert alert-success">Telegram linked!</div>
+            <div th:if="${telegramLinked == false}" class="alert alert-danger">Telegram not linked</div>
+
+            <div th:if="${message}" class="alert alert-success" th:text="${message}"></div>
+            <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+            <form th:action="@{/profile/generate-link}" method="post">
+                <button type="submit">Generate New Telegram Link Command</button>
+            </form>
+
+            <hr style="margin: 20px 0;">
+
+            <div th:if="${telegramCommand}" class="token-display">
+                <p><strong>Your command is ready!</strong></p>
+                <p>Copy the entire line below and send it as a message to your Telegram bot:</p>
+                <input type="text" th:value="${telegramCommand}" readonly onclick="this.select();">
+            </div>
+        </div>
     </div>
-</div>
-
-<div class="container">
-    <h2>Your Profile</h2>
-    <p>Link your Telegram account to receive OTPs for voting.</p>
-
-
-    <div th:if="${telegramLinked}" class="alert alert-success">Telegram linked!</div>
-    <div th:if="${telegramLinked == false}" class="alert alert-danger">Telegram not linked</div>
-
-    <div th:if="${message}" class="alert alert-success" th:text="${message}"></div>
-    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
-
-    <form th:action="@{/profile/generate-link}" method="post">
-        <button type="submit">Generate New Telegram Link Command</button>
-    </form>
-
-    <hr style="margin: 20px 0;">
-
-    <div th:if="${telegramCommand}" class="token-display">
-        <p><strong>Your command is ready!</strong></p>
-        <p>Copy the entire line below and send it as a message to your Telegram bot:</p>
-        <input type="text" th:value="${telegramCommand}" readonly onclick="this.select();">
-    </div>
-</div>
+</body>
+</html>
 
 </body>
 </html>

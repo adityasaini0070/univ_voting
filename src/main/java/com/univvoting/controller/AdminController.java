@@ -6,7 +6,9 @@ import java.util.*;
 
 import com.univvoting.model.Candidate;
 import com.univvoting.model.Election;
+import com.univvoting.model.User;
 import com.univvoting.repository.CandidateRepository;
+import com.univvoting.repository.VoteLedgerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -68,12 +70,25 @@ public class AdminController {
     private AdminService adminService;
     @Autowired
     private CandidateRepository candidateRepository;
-
     @Autowired
     private ElectionRepository electionRepository;
+    @Autowired
+    private VoteLedgerRepository voteLedgerRepository;
 
     @GetMapping
-    public String adminHome() {
+    public String adminHome(Model model) {
+        // Get statistics for dashboard
+        long totalElections = electionRepository.count();
+        long totalCandidates = candidateRepository.count();
+        long totalUsers = adminService.getAllUsers().size();
+        long totalVotes = voteLedgerRepository.count();
+        
+        // Add to model
+        model.addAttribute("totalElections", totalElections);
+        model.addAttribute("totalCandidates", totalCandidates);
+        model.addAttribute("totalUsers", totalUsers);
+        model.addAttribute("totalVotes", totalVotes);
+        
         return "admin/dashboard";
     }
 
@@ -151,5 +166,31 @@ public class AdminController {
             model.addAttribute("error", ex.getMessage());
         }
         return "redirect:/admin/elections";
+    }
+
+    @GetMapping("/users")
+    public String manageUsers(Model model) {
+        var users = adminService.getAllUsers();
+        model.addAttribute("users", users);
+        
+        // Count users by role
+        long adminCount = users.stream().filter(user -> "ADMIN".equals(user.getRole())).count();
+        long voterCount = users.stream().filter(user -> "VOTER".equals(user.getRole())).count();
+        
+        model.addAttribute("adminCount", adminCount);
+        model.addAttribute("voterCount", voterCount);
+        
+        return "admin/users";
+    }
+
+    @PostMapping("/delete-user")
+    public String deleteUser(@RequestParam UUID userId, Model model) {
+        try {
+            adminService.deleteUser(userId);
+            model.addAttribute("message", "User deleted successfully");
+        } catch (Exception ex) {
+            model.addAttribute("error", ex.getMessage());
+        }
+        return "redirect:/admin/users";
     }
 }

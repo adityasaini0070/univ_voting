@@ -2,53 +2,61 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8" />
-  <title>Login</title>
+  <title>Login - University Voting System</title>
   <link rel="stylesheet" th:href="@{/css/styles.css}" />
-  <style>
-    .navbar {
-      background: blue;
-      color: #fff;
-      padding: 10px 0;
-      margin-bottom: 30px;
-    }
-    .navbar a {
-      color: blue;
-      text-decoration: none;
-      margin: 0 15px;
-      font-weight: 500;
-    }
-    .navbar a:hover {
-      text-decoration: underline;
-    }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
-<div class="navbar">
-  <div class="container" style="border:none; padding:0; max-width:900px;">
-    <a th:href="@{/elections}">Elections</a>
-    <a th:href="@{/profile}">Profile</a>
-    <a th:href="@{/login}">Login</a>
-    <a th:href="@{/register}">Register</a>
-  </div>
-</div>
-<div class="container">
-  <h2>Login</h2>
-  <form th:action="@{/login}" method="post">
-    <p th:if="${param.error}" class="error">Invalid username or password</p>
-    <p th:if="${param.logout}" class="message">You have been logged out</p>
-    <div>
-      <label for="username">University ID:</label>
-      <input type="text" id="username" name="username" required autofocus />
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <div class="navbar-container">
+      <a href="/" class="navbar-brand">🗳️ University Voting</a>
+      <ul class="navbar-nav">
+        <li><a th:href="@{/elections}" class="nav-link">Elections</a></li>
+        <li><a th:href="@{/results}" class="nav-link">Results</a></li>
+        <li><a th:href="@{/login}" class="nav-link active">Login</a></li>
+        <li><a th:href="@{/register}" class="nav-link">Register</a></li>
+      </ul>
     </div>
-    <div>
-      <label for="password">Password:</label>
-      <input type="password" id="password" name="password" required />
+  </nav>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <div class="container">
+      <h2>Login to Your Account</h2>
+      
+      <!-- Error and Success Messages -->
+      <div th:if="${param.error}" class="alert alert-danger">
+        <strong>Error:</strong> Invalid username or password
+      </div>
+      <div th:if="${param.logout}" class="alert alert-success">
+        <strong>Success:</strong> You have been logged out successfully
+      </div>
+      
+      <!-- Login Form -->
+      <form th:action="@{/login}" method="post">
+        <div class="form-group">
+          <label for="username">University ID</label>
+          <input type="text" id="username" name="username" required autofocus 
+                 placeholder="Enter your university ID" />
+        </div>
+        
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" required 
+                 placeholder="Enter your password" />
+        </div>
+        
+        <div class="btn-group">
+          <button type="submit" class="btn btn-primary">Login</button>
+        </div>
+      </form>
+      
+      <!-- Bottom Links -->
+      <div class="bottom-links">
+        <p>Don't have an account? <a th:href="@{/register}">Register here</a></p>
+      </div>
     </div>
-    <button type="submit">Login</button>
-  </form>
-  <div class="bottom-links">
-    <a th:href="@{/register}">Don't have an account? Register</a>
   </div>
-</div>
 </body>
 </html>

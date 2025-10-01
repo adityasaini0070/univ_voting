@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Election Results - University Voting System</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        .result-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-left: 4px solid #007bff;
+        }
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .election-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #333;
+        }
+        .total-votes {
+            background: #e9ecef;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            color: #495057;
+        }
+        .no-results {
+            text-align: center;
+            color: #6c757d;
+            font-style: italic;
+            padding: 40px;
+        }
+        .winner-badge {
+            background: #28a745;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            margin-left: 10px;
+        }
+        .candidate-summary {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .candidate-summary:last-child {
+            border-bottom: none;
+        }
+        .vote-count {
+            font-weight: bold;
+            color: #007bff;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a th:href="@{/}" class="navbar-brand">🗳️ University Voting</a>
+            <ul class="navbar-nav">
+                <li><a th:href="@{/}" class="nav-link">Home</a></li>
+                <li><a th:href="@{/elections}" class="nav-link">Elections</a></li>
+                <li><a th:href="@{/results}" class="nav-link active">Results</a></li>
+                <li sec:authorize="hasRole('ADMIN')">
+                    <a th:href="@{/admin}" class="nav-link">Admin</a>
+                </li>
+                <li><a th:href="@{/profile}" class="nav-link">Profile</a></li>
+                <li><a th:href="@{/logout}" class="nav-link">Logout</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="container">
+            <h1>🗳️ Election Results</h1>
+            <p class="text-center mb-4">View results for all completed elections</p>
+
+            <div th:if="${error}" class="alert alert-danger">
+                <strong>Error:</strong> <span th:text="${error}"></span>
+            </div>
+
+            <div th:if="${#lists.isEmpty(electionResults)}" class="alert alert-info text-center">
+                <h3>No Elections Found</h3>
+                <p>There are no elections to display results for.</p>
+            </div>
+
+    <div th:each="result : ${electionResults}" class="result-card">
+        <div class="result-header">
+            <div class="election-title" th:text="${result.electionTitle}">Election Title</div>
+            <div class="total-votes" th:text="'Total Votes: ' + ${result.totalVotes}">Total Votes: 0</div>
+        </div>
+
+        <div th:if="${!result.hasResults}" class="no-results">
+            <p>No votes cast yet</p>
+        </div>
+
+        <div th:if="${result.hasResults}">
+            <div th:each="candidate : ${result.candidateResults}" class="candidate-summary">
+                <div>
+                    <span th:text="${candidate.candidateName}">Candidate Name</span>
+                    <span th:if="${candidate.winner}" class="winner-badge">WINNER</span>
+                </div>
+                <div class="vote-count" th:text="${candidate.voteCount} + ' votes'">0 votes</div>
+            </div>
+            
+            <div style="margin-top: 15px;">
+                <a th:href="@{/results/{id}(id=${result.electionId})}" class="btn btn-primary">View Detailed Results</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="btn-group">
+        <a th:href="@{/elections}" class="btn btn-secondary">Back to Elections</a>
+    </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2025 University Voting System</p>
+    </footer>
+</body>
+</html>

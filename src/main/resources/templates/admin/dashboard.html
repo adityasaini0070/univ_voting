@@ -2,48 +2,111 @@
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8" />
-    <title>Admin Dashboard</title>
+    <title>Admin Dashboard - University Voting System</title>
     <link rel="stylesheet" th:href="@{/css/styles.css}" />
-    <style>
-        .navbar {
-            background: blue;
-            color: #fff;
-            padding: 10px 0;
-            margin-bottom: 30px;
-        }
-        .navbar a {
-            color: blue;
-            text-decoration: none;
-            margin: 0 15px;
-            font-weight: 500;
-        }
-        .navbar a:hover {
-            text-decoration: underline;
-        }
-        .dashboard-buttons {
-            margin-bottom: 30px;
-        }
-        .dashboard-buttons a {
-            margin-right: 15px;
-        }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
-<div class="navbar">
-    <div class="container" style="border:none; padding:0; max-width:900px;">
-        <a th:href="@{/elections}">Elections</a>
-        <a th:href="@{/profile}">Profile</a>
-        <a th:href="@{/logout}">Logout</a>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a th:href="@{/}" class="navbar-brand">🗳️ University Voting</a>
+            <ul class="navbar-nav">
+                <li><a th:href="@{/}" class="nav-link">Home</a></li>
+                <li><a th:href="@{/elections}" class="nav-link">Elections</a></li>
+                <li><a th:href="@{/results}" class="nav-link">Results</a></li>
+                <li><a th:href="@{/admin}" class="nav-link active">Admin</a></li>
+                <li><a th:href="@{/profile}" class="nav-link">Profile</a></li>
+                <li><a th:href="@{/logout}" class="nav-link">Logout</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="container">
+            <h1>🛠️ Admin Dashboard</h1>
+            <p class="text-center mb-4">Manage elections, candidates, users, and system settings</p>
+
+            <!-- Admin Actions Grid -->
+            <div class="stats-container">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title">🗳️ Election Management</h4>
+                    </div>
+                    <div class="btn-group">
+                        <a th:href="@{/admin/create-election}" class="btn btn-primary">Create Election</a>
+                        <a th:href="@{/admin/elections}" class="btn btn-secondary">View Elections</a>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title">👥 Candidate Management</h4>
+                    </div>
+                    <div class="btn-group">
+                        <a th:href="@{/admin/create-candidate}" class="btn btn-primary">Add Candidate</a>
+                        <a th:href="@{/admin/elections}" class="btn btn-secondary">View Elections & Candidates</a>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title">🔧 User Management</h4>
+                    </div>
+                    <div class="btn-group">
+                        <a th:href="@{/admin/users}" class="btn btn-primary">Manage Users</a>
+                        <a th:href="@{/admin/users}" class="btn btn-secondary">User Statistics</a>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title">📊 Results & Analytics</h4>
+                    </div>
+                    <div class="btn-group">
+                        <a th:href="@{/results}" class="btn btn-primary">View Results</a>
+                        <a th:href="@{/results}" class="btn btn-secondary">Analytics</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h4 class="card-title">📈 System Overview</h4>
+                </div>
+                <div class="stats-container">
+                    <div class="stat-card">
+                        <div class="stat-number" th:text="${totalElections}">0</div>
+                        <div class="stat-label">Total Elections</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" th:text="${totalCandidates}">0</div>
+                        <div class="stat-label">Total Candidates</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" th:text="${totalUsers}">0</div>
+                        <div class="stat-label">Total Users</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" th:text="${totalVotes}">0</div>
+                        <div class="stat-label">Votes Cast</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Welcome Message -->
+            <div class="alert alert-info mt-4">
+                <strong>Welcome Admin!</strong> Use the management panels above to administer the voting system. 
+                You can create elections, manage candidates, oversee users, and monitor voting results.
+            </div>
+        </div>
     </div>
-</div>
-<div class="container" style="max-width: 900px;">
-    <h2>Admin Dashboard</h2>
-    <div class="dashboard-buttons">
-        <a th:href="@{/admin/create-election}" class="button">Add Election</a>
-        <a th:href="@{/admin/create-candidate}" class="button">Add Candidate</a>
-        <a th:href="@{/admin/elections}" class="button">View All Elections</a>
-    </div>
-    <p>Welcome to the admin dashboard. Use the buttons above to manage elections and candidates.</p>
-</div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2025 University Voting System - Admin Panel</p>
+    </footer>
 </body>
 </html>

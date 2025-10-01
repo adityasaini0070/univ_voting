@@ -18,6 +18,11 @@ public class UserService {
                 .orElse(false);
     }
     public boolean setRoleByUniversityId(String universityId, String newRole) {
+        // Prevent setting ADMIN role through this method
+        if ("ADMIN".equals(newRole)) {
+            throw new IllegalArgumentException("Admin role cannot be assigned through user management. Use the predefined admin credentials.");
+        }
+        
         Optional<User> userOpt = userRepository.findByUniversityId(universityId);
         if (userOpt.isPresent()) {
             User user = userOpt.get();
@@ -37,6 +42,12 @@ public class UserService {
     public User register(String universityId, String fullName, String role, String plainPassword, String phoneNumber) {
         Optional<User> ex = userRepository.findByUniversityId(universityId);
         if (ex.isPresent()) throw new IllegalArgumentException("University ID already registered");
+        
+        // Only allow VOTER role through registration
+        if (!"VOTER".equals(role)) {
+            throw new IllegalArgumentException("Only VOTER role is allowed for new registrations");
+        }
+        
         User u = new User();
         u.setUniversityId(universityId);
         u.setFullName(fullName);

@@ -7,4 +7,5 @@ import java.util.UUID;
 
 public interface OtpAttemptRepository extends JpaRepository<OtpAttempt, UUID> {
     Optional<OtpAttempt> findTopByUserIdOrderByCreatedAtDesc(UUID userId);
+    void deleteByUserId(UUID userId);
 }

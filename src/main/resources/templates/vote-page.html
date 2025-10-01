@@ -10,7 +10,7 @@
     <div class="container" style="border:none; padding:0; max-width:900px;">
         <a th:href="@{/elections}">Elections</a>
         <a th:href="@{/profile}">Profile</a>
-        <a th:href="@{/admin/elections}" sec:authorize="hasRole('ADMIN')">Admin Dashboard</a>
+        <a th:href="@{/admin}" sec:authorize="hasRole('ADMIN')">Admin Dashboard</a>
         <a th:href="@{/logout}">Logout</a>
     </div>
 </div>

@@ -2,86 +2,100 @@
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8" />
-    <title>Elections</title>
+    <title>Elections - University Voting System</title>
     <link rel="stylesheet" th:href="@{/css/styles.css}" />
-    <style>
-        .navbar {
-            background: blue;
-            color: #fff;
-            padding: 10px 0;
-            margin-bottom: 30px;
-        }
-        .navbar a {
-            color: blue;
-            text-decoration: none;
-            margin: 0 15px;
-            font-weight: 500;
-        }
-        .navbar a:hover {
-            text-decoration: underline;
-        }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
-<div class="navbar">
-    <div class="container" style="border:none; padding:0; max-width:900px;">
-        <a th:href="@{/elections}">Elections</a>
-        <a th:href="@{/profile}">Profile</a>
-        <a th:href="@{/logout}">Logout</a>
-    </div>
-</div>
-<div class="container" style="max-width: 900px;">
-    <h2>Available Elections</h2>
-    <p th:if="${message}" class="message" th:text="${message}"></p>
-    <p th:if="${error}" class="error" th:text="${error}"></p>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a th:href="@{/}" class="navbar-brand">🗳️ University Voting</a>
+            <ul class="navbar-nav">
+                <li><a th:href="@{/}" class="nav-link">Home</a></li>
+                <li><a th:href="@{/elections}" class="nav-link active">Elections</a></li>
+                <li><a th:href="@{/results}" class="nav-link">Results</a></li>
+                <li sec:authorize="hasRole('ADMIN')">
+                    <a th:href="@{/admin}" class="nav-link">Admin</a>
+                </li>
+                <li><a th:href="@{/profile}" class="nav-link">Profile</a></li>
+                <li><a th:href="@{/logout}" class="nav-link">Logout</a></li>
+            </ul>
+        </div>
+    </nav>
 
-    <div sec:authorize="hasRole('ADMIN')" style="margin-bottom: 20px;">
-        <a th:href="@{/admin/elections}" class="button">Go to Admin Dashboard</a>
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="container">
+            <h1>🗳️ Available Elections</h1>
+            
+            <!-- Messages -->
+            <div th:if="${message}" class="alert alert-success">
+                <span th:text="${message}"></span>
+            </div>
+            <div th:if="${error}" class="alert alert-danger">
+                <span th:text="${error}"></span>
+            </div>
+
+            <!-- Admin Link -->
+            <div sec:authorize="hasRole('ADMIN')" class="btn-group">
+                <a th:href="@{/admin}" class="btn btn-secondary">Go to Admin Dashboard</a>
+            </div>
+
+            <!-- Elections Table -->
+            <div class="table-container">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Start Time</th>
+                        <th>End Time</th>
+                        <th>Candidates</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="election : ${elections}">
+                        <td th:text="${election.title}"></td>
+                        <td th:text="${election.startTime != null ? #temporals.format(election.startTime, 'yyyy-MM-dd HH:mm') : 'N/A'}"></td>
+                        <td th:text="${election.endTime != null ? #temporals.format(election.endTime, 'yyyy-MM-dd HH:mm') : 'N/A'}"></td>
+                        <td>
+                            <ul style="padding-left: 20px; margin: 0;">
+                                <li th:each="candidate : ${candidatesMap[election.id]}" th:text="${candidate.name}"></li>
+                            </ul>
+                        </td>
+                        <td>
+                            <div sec:authorize="hasRole('VOTER')">
+                                <form th:action="@{/vote/select-candidate}" method="post" th:if="${#temporals.createNow().isAfter(election.startTime) and #temporals.createNow().isBefore(election.endTime)}">
+                                    <input type="hidden" name="electionId" th:value="${election.id}" />
+                                    <select name="candidateId" class="form-control mb-2">
+                                        <option th:each="candidate : ${candidatesMap[election.id]}"
+                                                th:value="${candidate.id}"
+                                                th:text="${candidate.name}"></option>
+                                    </select>
+                                    <button type="submit" class="btn btn-primary">Request OTP to Vote</button>
+                                </form>
+                            </div>
+                            <span th:if="${#temporals.createNow().isBefore(election.startTime)}" class="text-muted">Not yet started</span>
+                            <span th:if="${#temporals.createNow().isAfter(election.endTime)}" class="text-muted">Ended</span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Logout Button -->
+            <div class="btn-group">
+                <form th:action="@{/logout}" method="post">
+                    <button type="submit" class="btn btn-secondary">Logout</button>
+                </form>
+            </div>
+        </div>
     </div>
 
-    <table>
-        <thead>
-        <tr>
-            <th>Name</th>
-            <th>Start Time</th>
-            <th>End Time</th>
-            <th>Candidates</th>
-            <th>Action</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="election : ${elections}">
-            <td th:text="${election.title}"></td>
-            <td th:text="${election.startTime != null ? #temporals.format(election.startTime, 'yyyy-MM-dd HH:mm') : 'N/A'}"></td>
-            <td th:text="${election.endTime != null ? #temporals.format(election.endTime, 'yyyy-MM-dd HH:mm') : 'N/A'}"></td>
-            <td>
-                <ul style="padding-left: 20px;">
-                    <li th:each="candidate : ${candidatesMap[election.id]}" th:text="${candidate.name}"></li>
-                </ul>
-            </td>
-            <td>
-                <div sec:authorize="hasRole('VOTER')">
-                    <form th:action="@{/vote/select-candidate}" method="post" th:if="${#temporals.createNow().isAfter(election.startTime) and #temporals.createNow().isBefore(election.endTime)}">
-                        <input type="hidden" name="electionId" th:value="${election.id}" />
-                        <select name="candidateId" style="margin-bottom: 10px;">
-                            <option th:each="candidate : ${candidatesMap[election.id]}"
-                                    th:value="${candidate.id}"
-                                    th:text="${candidate.name}"></option>
-                        </select>
-                        <button type="submit">Request OTP to Vote</button>
-                    </form>
-                </div>
-                <span th:if="${#temporals.createNow().isBefore(election.startTime)}">Not yet started</span>
-                <span th:if="${#temporals.createNow().isAfter(election.endTime)}">Ended</span>
-            </td>
-        </tr>
-        </tbody>
-    </table>
-    <div class="bottom-links">
-        <form th:action="@{/logout}" method="post">
-            <button type="submit" class="button">Logout</button>
-        </form>
-    </div>
-</div>
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2025 University Voting System</p>
+    </footer>
 </body>
 </html>
