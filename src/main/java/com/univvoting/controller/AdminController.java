@@ -6,7 +6,6 @@ import java.util.*;
 
 import com.univvoting.model.Candidate;
 import com.univvoting.model.Election;
-import com.univvoting.model.User;
 import com.univvoting.repository.CandidateRepository;
 import com.univvoting.repository.VoteLedgerRepository;
 import org.springframework.beans.factory.annotation.Autowired;

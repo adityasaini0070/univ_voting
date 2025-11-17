@@ -1,9 +1,8 @@
 package com.univvoting.service;
 
-import com.univvoting.model.TelegramLink;
-import com.univvoting.model.User;
-import com.univvoting.repository.TelegramLinkRepository;
-import com.univvoting.repository.UserRepository;
+import java.util.Optional;
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -11,9 +10,12 @@ import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
-import java.util.Optional;
-import java.util.UUID;
+import com.univvoting.model.TelegramLink;
+import com.univvoting.model.User;
+import com.univvoting.repository.TelegramLinkRepository;
+import com.univvoting.repository.UserRepository;
 
+@SuppressWarnings("deprecation")
 @Service
 public class TelegramBotService extends TelegramLongPollingBot {
 
