@@ -14,6 +14,29 @@ import org.springframework.security.web.SecurityFilterChain;
 
 import com.univvoting.repository.UserRepository;
 
+/**
+ * Spring Security configuration for the University Voting System.
+ * Implements multi-layer security architecture with role-based access control.
+ * 
+ * <p>Security Layers:
+ * <ul>
+ *   <li><b>Authentication</b>: Form-based login with BCrypt password hashing</li>
+ *   <li><b>Authorization</b>: Role-based access (STUDENT, FACULTY, ADMIN)</li>
+ *   <li><b>Verification</b>: OTP validation for sensitive operations</li>
+ * </ul>
+ * 
+ * <p>OWASP Compliance:
+ * <ul>
+ *   <li>BCrypt password encoding (prevents cryptographic failures)</li>
+ *   <li>Role-based authorization (prevents broken access control)</li>
+ *   <li>CSRF protection enabled for state-changing operations</li>
+ *   <li>Secure session management</li>
+ * </ul>
+ * 
+ * @author Your Name
+ * @version 1.0
+ * @since 2025-12-14
+ */
 @Configuration
 @EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
