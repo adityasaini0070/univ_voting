@@ -1,37 +1,32 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8" />
     <title>Create Election</title>
     <link rel="stylesheet" th:href="@{/css/styles.css}" />
-    <style>
-        .navbar {
-            background: black;
-            color: #fff;
-            padding: 10px 0;
-            margin-bottom: 30px;
-        }
-        .navbar a {
-            color: black;
-            text-decoration: none;
-            margin: 0 15px;
-            font-weight: 500;
-        }
-        .navbar a:hover {
-            text-decoration: underline;
-        }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
-<div class="navbar">
-    <div class="container" style="border:none; padding:0; max-width:900px;">
-        <a th:href="@{/elections}">Elections</a>
-        <a th:href="@{/profile}">Profile</a>
-        <a th:href="@{/admin}">Admin Dashboard</a>
-        <a th:href="@{/logout}">Logout</a>
-    </div>
-</div>
-<div class="container">
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a th:href="@{/}" class="navbar-brand">🗳️ University Voting</a>
+            <ul class="navbar-nav">
+                <li><a th:href="@{/}" class="nav-link">Home</a></li>
+                <li><a th:href="@{/elections}" class="nav-link">Elections</a></li>
+                <li><a th:href="@{/results}" class="nav-link">Results</a></li>
+                <li sec:authorize="hasRole('ADMIN')">
+                    <a th:href="@{/admin}" class="nav-link active">Admin</a>
+                </li>
+                <li><a th:href="@{/profile}" class="nav-link">Profile</a></li>
+                <li><a th:href="@{/logout}" class="nav-link">Logout</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="container">
     <h2>Create Election</h2>
     <p th:if="${message}" class="message" th:text="${message}"></p>
     <p th:if="${error}" class="error" th:text="${error}"></p>
@@ -54,6 +49,7 @@
         <a th:href="@{/admin}" class="button">Back to Admin Dashboard</a>
         <a th:href="@{/admin/create-candidate}" class="button">Create Candidate</a>
     </div>
-</div>
+        </div>
+    </div>
 </body>
 </html>
