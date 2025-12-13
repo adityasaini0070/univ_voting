@@ -3,6 +3,8 @@ package com.univvoting.service;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -18,6 +20,8 @@ import com.univvoting.repository.UserRepository;
 @SuppressWarnings("deprecation")
 @Service
 public class TelegramBotService extends TelegramLongPollingBot {
+
+    private static final Logger logger = LoggerFactory.getLogger(TelegramBotService.class);
 
     @Autowired
     private TelegramLinkRepository linkRepo;
@@ -78,18 +82,18 @@ public class TelegramBotService extends TelegramLongPollingBot {
         try {
             execute(new org.telegram.telegrambots.meta.api.methods.send.SendMessage(
                     chatId.toString(), text));
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (org.telegram.telegrambots.meta.exceptions.TelegramApiException e) {
+            logger.error("Failed to send Telegram message to chatId: " + chatId, e);
         }
     }
 
     @Override
     public String getBotUsername() {
-        return "univvote_bot"; 
+        return botUsername; 
     }
 
     @Override
     public String getBotToken() {
-        return "8080890392:AAE-SKLrxks2TTrpo7vDYFQulYjweASPeX4"; 
+        return botToken; 
     }
 }
