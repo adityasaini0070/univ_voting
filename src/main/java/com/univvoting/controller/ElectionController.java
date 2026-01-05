@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,14 +19,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Controller
 public class ElectionController {
 
-
     @Autowired
     private ElectionRepository electionRepository;
 
     @Autowired
     private CandidateRepository candidateRepository;
+
     @GetMapping("/elections/vote")
-    public String votePage(@RequestParam UUID electionId, Model model) {
+    public String votePage(@RequestParam @NonNull UUID electionId, Model model) {
         var election = electionRepository.findById(electionId).orElse(null);
         if (election == null) {
             return "redirect:/elections";
@@ -36,6 +37,7 @@ public class ElectionController {
         model.addAttribute("candidates", candidates);
         return "vote-page";
     }
+
     @GetMapping("/elections")
     public String listElections(Model model) {
         var elections = electionRepository.findAll();

@@ -7,6 +7,7 @@ import com.univvoting.repository.BallotBoxRepository;
 import com.univvoting.repository.CandidateRepository;
 import com.univvoting.repository.ElectionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -40,20 +41,45 @@ public class ElectionResultService {
         }
 
         // Getters and setters
-        public UUID getCandidateId() { return candidateId; }
-        public void setCandidateId(UUID candidateId) { this.candidateId = candidateId; }
-        
-        public String getCandidateName() { return candidateName; }
-        public void setCandidateName(String candidateName) { this.candidateName = candidateName; }
-        
-        public String getManifesto() { return manifesto; }
-        public void setManifesto(String manifesto) { this.manifesto = manifesto; }
-        
-        public long getVoteCount() { return voteCount; }
-        public void setVoteCount(long voteCount) { this.voteCount = voteCount; }
-        
-        public boolean isWinner() { return isWinner; }
-        public void setWinner(boolean winner) { this.isWinner = winner; }
+        public UUID getCandidateId() {
+            return candidateId;
+        }
+
+        public void setCandidateId(UUID candidateId) {
+            this.candidateId = candidateId;
+        }
+
+        public String getCandidateName() {
+            return candidateName;
+        }
+
+        public void setCandidateName(String candidateName) {
+            this.candidateName = candidateName;
+        }
+
+        public String getManifesto() {
+            return manifesto;
+        }
+
+        public void setManifesto(String manifesto) {
+            this.manifesto = manifesto;
+        }
+
+        public long getVoteCount() {
+            return voteCount;
+        }
+
+        public void setVoteCount(long voteCount) {
+            this.voteCount = voteCount;
+        }
+
+        public boolean isWinner() {
+            return isWinner;
+        }
+
+        public void setWinner(boolean winner) {
+            this.isWinner = winner;
+        }
     }
 
     public static class ElectionResult {
@@ -72,29 +98,54 @@ public class ElectionResultService {
         }
 
         // Getters and setters
-        public UUID getElectionId() { return electionId; }
-        public void setElectionId(UUID electionId) { this.electionId = electionId; }
-        
-        public String getElectionTitle() { return electionTitle; }
-        public void setElectionTitle(String electionTitle) { this.electionTitle = electionTitle; }
-        
-        public List<CandidateResult> getCandidateResults() { return candidateResults; }
-        public void setCandidateResults(List<CandidateResult> candidateResults) { this.candidateResults = candidateResults; }
-        
-        public long getTotalVotes() { return totalVotes; }
-        public void setTotalVotes(long totalVotes) { this.totalVotes = totalVotes; }
-        
-        public boolean isHasResults() { return hasResults; }
-        public void setHasResults(boolean hasResults) { this.hasResults = hasResults; }
+        public UUID getElectionId() {
+            return electionId;
+        }
+
+        public void setElectionId(UUID electionId) {
+            this.electionId = electionId;
+        }
+
+        public String getElectionTitle() {
+            return electionTitle;
+        }
+
+        public void setElectionTitle(String electionTitle) {
+            this.electionTitle = electionTitle;
+        }
+
+        public List<CandidateResult> getCandidateResults() {
+            return candidateResults;
+        }
+
+        public void setCandidateResults(List<CandidateResult> candidateResults) {
+            this.candidateResults = candidateResults;
+        }
+
+        public long getTotalVotes() {
+            return totalVotes;
+        }
+
+        public void setTotalVotes(long totalVotes) {
+            this.totalVotes = totalVotes;
+        }
+
+        public boolean isHasResults() {
+            return hasResults;
+        }
+
+        public void setHasResults(boolean hasResults) {
+            this.hasResults = hasResults;
+        }
     }
 
-    public ElectionResult getElectionResults(UUID electionId) {
+    public ElectionResult getElectionResults(@NonNull UUID electionId) {
         // Get election details
         Optional<Election> electionOpt = electionRepository.findById(electionId);
         if (electionOpt.isEmpty()) {
             throw new IllegalArgumentException("Election not found");
         }
-        
+
         Election election = electionOpt.get();
         ElectionResult result = new ElectionResult(electionId, election.getTitle());
 
@@ -106,24 +157,22 @@ public class ElectionResultService {
 
         // Get all votes for this election
         List<BallotBox> votes = ballotBoxRepository.findByElectionId(electionId);
-        
+
         // Count votes by candidate
         Map<UUID, Long> voteCountMap = votes.stream()
                 .collect(Collectors.groupingBy(
-                    BallotBox::getCandidateId,
-                    Collectors.counting()
-                ));
+                        BallotBox::getCandidateId,
+                        Collectors.counting()));
 
         // Create candidate results
         List<CandidateResult> candidateResults = candidates.stream()
                 .map(candidate -> {
                     long voteCount = voteCountMap.getOrDefault(candidate.getId(), 0L);
                     return new CandidateResult(
-                        candidate.getId(), 
-                        candidate.getName(), 
-                        candidate.getManifesto(), 
-                        voteCount
-                    );
+                            candidate.getId(),
+                            candidate.getName(),
+                            candidate.getManifesto(),
+                            voteCount);
                 })
                 .sorted((a, b) -> Long.compare(b.getVoteCount(), a.getVoteCount())) // Sort by vote count descending
                 .collect(Collectors.toList());

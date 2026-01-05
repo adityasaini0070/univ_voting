@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,7 +44,7 @@ public class AdminServiceImpl implements AdminService {
         if (endTime == null) {
             throw new NullPointerException("End time cannot be null");
         }
-        
+
         Election election = new Election();
         election.setTitle(name);
         election.setStartTime(startTime);
@@ -62,7 +63,7 @@ public class AdminServiceImpl implements AdminService {
         if (electionId == null) {
             throw new NullPointerException("Election ID cannot be null");
         }
-        
+
         Candidate candidate = new Candidate();
         candidate.setName(name);
         candidate.setManifesto(description);
@@ -74,14 +75,20 @@ public class AdminServiceImpl implements AdminService {
     public List<Election> getAllElections() {
         return electionRepository.findAll();
     }
+
     @Override
-    public void deleteElection(UUID id) {
+    public void deleteElection(@NonNull UUID id) {
         electionRepository.deleteById(id);
     }
 
     @Override
-    public void updateElection(UUID id, String name, Instant startTime, Instant endTime) {
-        var election = electionRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Election not found"));
+    public void updateElection(@NonNull UUID id, String name, Instant startTime, Instant endTime) {
+        if (id == null) {
+            throw new NullPointerException("Election ID cannot be null");
+        }
+
+        var election = electionRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Election not found"));
         election.setTitle(name);
         election.setStartTime(startTime);
         election.setEndTime(endTime);
@@ -95,19 +102,15 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     @Transactional
-    public void deleteUser(UUID userId) {
-        if (userId == null) {
-            throw new NullPointerException("User ID cannot be null");
-        }
-        
+    public void deleteUser(@NonNull UUID userId) {
         // Check if user exists
         if (!userRepository.existsById(userId)) {
             throw new IllegalArgumentException("User not found");
         }
-        
+
         // First delete all related OTP attempts
         otpAttemptRepository.deleteByUserId(userId);
-        
+
         // Now delete the user
         userRepository.deleteById(userId);
     }

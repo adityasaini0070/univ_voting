@@ -10,6 +10,7 @@ import com.univvoting.repository.CandidateRepository;
 import com.univvoting.repository.VoteLedgerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.lang.NonNull;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -27,7 +28,7 @@ import com.univvoting.service.AdminService;
 public class AdminController {
 
     @GetMapping("/edit-election")
-    public String editElectionForm(@RequestParam UUID id, Model model) {
+    public String editElectionForm(@RequestParam @NonNull UUID id, Model model) {
         var election = electionRepository.findById(id).orElse(null);
         if (election == null) {
             model.addAttribute("error", "Election not found");
@@ -38,11 +39,11 @@ public class AdminController {
     }
 
     @PostMapping("/edit-election")
-    public String editElection(@RequestParam UUID id,
-                              @RequestParam String name,
-                              @RequestParam("startTime") @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm") LocalDateTime startTime,
-                              @RequestParam("endTime") @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm") LocalDateTime endTime,
-                              Model model) {
+    public String editElection(@RequestParam @NonNull UUID id,
+            @RequestParam String name,
+            @RequestParam("startTime") @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm") LocalDateTime startTime,
+            @RequestParam("endTime") @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm") LocalDateTime endTime,
+            Model model) {
         try {
             var startInstant = startTime.atZone(ZoneId.systemDefault()).toInstant();
             var endInstant = endTime.atZone(ZoneId.systemDefault()).toInstant();
@@ -55,7 +56,7 @@ public class AdminController {
     }
 
     @PostMapping("/delete-election")
-    public String deleteElection(@RequestParam UUID id, Model model) {
+    public String deleteElection(@RequestParam @NonNull UUID id, Model model) {
         try {
             adminService.deleteElection(id);
             model.addAttribute("message", "Election deleted successfully");
@@ -81,13 +82,13 @@ public class AdminController {
         long totalCandidates = candidateRepository.count();
         long totalUsers = adminService.getAllUsers().size();
         long totalVotes = voteLedgerRepository.count();
-        
+
         // Add to model
         model.addAttribute("totalElections", totalElections);
         model.addAttribute("totalCandidates", totalCandidates);
         model.addAttribute("totalUsers", totalUsers);
         model.addAttribute("totalVotes", totalVotes);
-        
+
         return "admin/dashboard";
     }
 
@@ -105,8 +106,15 @@ public class AdminController {
             view.put("title", election.getTitle());
             view.put("startTime", election.getStartTime());
             view.put("endTime", election.getEndTime());
-            view.put("startTimeLocal", election.getStartTime() != null ? java.time.LocalDateTime.ofInstant(election.getStartTime(), java.time.ZoneId.systemDefault()) : null);
-            view.put("endTimeLocal", election.getEndTime() != null ? java.time.LocalDateTime.ofInstant(election.getEndTime(), java.time.ZoneId.systemDefault()) : null);
+            view.put("startTimeLocal",
+                    election.getStartTime() != null
+                            ? java.time.LocalDateTime.ofInstant(election.getStartTime(),
+                                    java.time.ZoneId.systemDefault())
+                            : null);
+            view.put("endTimeLocal",
+                    election.getEndTime() != null
+                            ? java.time.LocalDateTime.ofInstant(election.getEndTime(), java.time.ZoneId.systemDefault())
+                            : null);
             electionViews.add(view);
         }
 
@@ -114,7 +122,8 @@ public class AdminController {
         var candidatesMap = new HashMap<UUID, List<Candidate>>();
         for (var election : elections) {
             List<Candidate> candidates = candidateRepository.findByElectionId(election.getId());
-            if (candidates == null) candidates = new ArrayList<>();
+            if (candidates == null)
+                candidates = new ArrayList<>();
             candidatesMap.put(election.getId(), candidates);
         }
 
@@ -132,9 +141,9 @@ public class AdminController {
 
     @PostMapping("/create-election")
     public String createElection(@RequestParam String name,
-                                 @RequestParam("startTime") @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm") LocalDateTime startTime,
-                                 @RequestParam("endTime") @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm") LocalDateTime endTime,
-                                 Model model) {
+            @RequestParam("startTime") @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm") LocalDateTime startTime,
+            @RequestParam("endTime") @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm") LocalDateTime endTime,
+            Model model) {
         try {
             // Convert LocalDateTime to Instant using system default zone
             var startInstant = startTime.atZone(ZoneId.systemDefault()).toInstant();
@@ -155,9 +164,9 @@ public class AdminController {
 
     @PostMapping("/create-candidate")
     public String createCandidate(@RequestParam String name,
-                                  @RequestParam String description,
-                                  @RequestParam UUID electionId,
-                                  Model model) {
+            @RequestParam String description,
+            @RequestParam @NonNull UUID electionId,
+            Model model) {
         try {
             adminService.createCandidate(name, description, electionId);
             model.addAttribute("message", "Candidate created successfully");
@@ -171,19 +180,19 @@ public class AdminController {
     public String manageUsers(Model model) {
         var users = adminService.getAllUsers();
         model.addAttribute("users", users);
-        
+
         // Count users by role
         long adminCount = users.stream().filter(user -> "ADMIN".equals(user.getRole())).count();
         long voterCount = users.stream().filter(user -> "VOTER".equals(user.getRole())).count();
-        
+
         model.addAttribute("adminCount", adminCount);
         model.addAttribute("voterCount", voterCount);
-        
+
         return "admin/users";
     }
 
     @PostMapping("/delete-user")
-    public String deleteUser(@RequestParam UUID userId, Model model) {
+    public String deleteUser(@RequestParam @NonNull UUID userId, Model model) {
         try {
             adminService.deleteUser(userId);
             model.addAttribute("message", "User deleted successfully");
