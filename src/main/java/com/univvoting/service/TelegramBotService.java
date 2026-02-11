@@ -3,9 +3,9 @@ package com.univvoting.service;
 import java.util.Optional;
 import java.util.UUID;
 
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -19,28 +19,28 @@ import com.univvoting.repository.UserRepository;
 
 @SuppressWarnings("deprecation")
 @Service
+@RequiredArgsConstructor
 public class TelegramBotService extends TelegramLongPollingBot {
 
     private static final Logger logger = LoggerFactory.getLogger(TelegramBotService.class);
 
-    @Autowired
-    private TelegramLinkRepository linkRepo;
+    private final TelegramLinkRepository linkRepo;
 
-    @Autowired
-    private UserRepository userRepo;
+    private final UserRepository userRepo;
 
-     @Value("${telegram.bot.username}")
+    @Value("${telegram.bot.username}")
     private String botUsername;
 
     @Value("${telegram.bot.token}")
     private String botToken;
 
-    
     @Override
     public void onUpdateReceived(Update update) {
-        if (!update.hasMessage()) return;
+        if (!update.hasMessage())
+            return;
         Message msg = update.getMessage();
-        if (!msg.hasText()) return;
+        if (!msg.hasText())
+            return;
 
         String text = msg.getText().trim();
         Long chatId = msg.getChatId();
@@ -89,11 +89,11 @@ public class TelegramBotService extends TelegramLongPollingBot {
 
     @Override
     public String getBotUsername() {
-        return botUsername; 
+        return botUsername;
     }
 
     @Override
     public String getBotToken() {
-        return botToken; 
+        return botToken;
     }
 }

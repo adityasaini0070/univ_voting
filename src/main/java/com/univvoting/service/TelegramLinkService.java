@@ -2,7 +2,7 @@ package com.univvoting.service;
 
 import com.univvoting.model.TelegramLink;
 import com.univvoting.repository.TelegramLinkRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
@@ -11,9 +11,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class TelegramLinkService {
-    @Autowired
-    private TelegramLinkRepository repo;
+    private final TelegramLinkRepository repo;
 
     private final SecureRandom rnd = new SecureRandom();
 
@@ -31,5 +31,7 @@ public class TelegramLinkService {
         return repo.findByToken(token);
     }
 
-    public void delete(TelegramLink t) { repo.delete(t); }
+    public void delete(TelegramLink t) {
+        repo.delete(t);
+    }
 }

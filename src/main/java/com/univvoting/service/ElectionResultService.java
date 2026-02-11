@@ -6,7 +6,10 @@ import com.univvoting.model.Election;
 import com.univvoting.repository.BallotBoxRepository;
 import com.univvoting.repository.CandidateRepository;
 import com.univvoting.repository.ElectionRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
@@ -14,17 +17,16 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class ElectionResultService {
 
-    @Autowired
-    private BallotBoxRepository ballotBoxRepository;
+    private final BallotBoxRepository ballotBoxRepository;
+    private final CandidateRepository candidateRepository;
+    private final ElectionRepository electionRepository;
 
-    @Autowired
-    private CandidateRepository candidateRepository;
-
-    @Autowired
-    private ElectionRepository electionRepository;
-
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
     public static class CandidateResult {
         private UUID candidateId;
         private String candidateName;
@@ -39,49 +41,11 @@ public class ElectionResultService {
             this.voteCount = voteCount;
             this.isWinner = false;
         }
-
-        // Getters and setters
-        public UUID getCandidateId() {
-            return candidateId;
-        }
-
-        public void setCandidateId(UUID candidateId) {
-            this.candidateId = candidateId;
-        }
-
-        public String getCandidateName() {
-            return candidateName;
-        }
-
-        public void setCandidateName(String candidateName) {
-            this.candidateName = candidateName;
-        }
-
-        public String getManifesto() {
-            return manifesto;
-        }
-
-        public void setManifesto(String manifesto) {
-            this.manifesto = manifesto;
-        }
-
-        public long getVoteCount() {
-            return voteCount;
-        }
-
-        public void setVoteCount(long voteCount) {
-            this.voteCount = voteCount;
-        }
-
-        public boolean isWinner() {
-            return isWinner;
-        }
-
-        public void setWinner(boolean winner) {
-            this.isWinner = winner;
-        }
     }
 
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
     public static class ElectionResult {
         private UUID electionId;
         private String electionTitle;
@@ -96,75 +60,29 @@ public class ElectionResultService {
             this.totalVotes = 0;
             this.hasResults = false;
         }
-
-        // Getters and setters
-        public UUID getElectionId() {
-            return electionId;
-        }
-
-        public void setElectionId(UUID electionId) {
-            this.electionId = electionId;
-        }
-
-        public String getElectionTitle() {
-            return electionTitle;
-        }
-
-        public void setElectionTitle(String electionTitle) {
-            this.electionTitle = electionTitle;
-        }
-
-        public List<CandidateResult> getCandidateResults() {
-            return candidateResults;
-        }
-
-        public void setCandidateResults(List<CandidateResult> candidateResults) {
-            this.candidateResults = candidateResults;
-        }
-
-        public long getTotalVotes() {
-            return totalVotes;
-        }
-
-        public void setTotalVotes(long totalVotes) {
-            this.totalVotes = totalVotes;
-        }
-
-        public boolean isHasResults() {
-            return hasResults;
-        }
-
-        public void setHasResults(boolean hasResults) {
-            this.hasResults = hasResults;
-        }
     }
 
-    public ElectionResult getElectionResults(@NonNull UUID electionId) {
-        // Get election details
-        Optional<Election> electionOpt = electionRepository.findById(electionId);
-        if (electionOpt.isEmpty()) {
-            throw new IllegalArgumentException("Election not found");
-        }
+    // ---------------- SERVICE METHODS ----------------
 
-        Election election = electionOpt.get();
+    public ElectionResult getElectionResults(@NonNull UUID electionId) {
+
+        Election election = electionRepository.findById(electionId)
+                .orElseThrow(() -> new IllegalArgumentException("Election not found"));
+
         ElectionResult result = new ElectionResult(electionId, election.getTitle());
 
-        // Get all candidates for this election
         List<Candidate> candidates = candidateRepository.findByElectionId(electionId);
         if (candidates.isEmpty()) {
-            return result; // No candidates, no results
+            return result;
         }
 
-        // Get all votes for this election
         List<BallotBox> votes = ballotBoxRepository.findByElectionId(electionId);
 
-        // Count votes by candidate
         Map<UUID, Long> voteCountMap = votes.stream()
                 .collect(Collectors.groupingBy(
                         BallotBox::getCandidateId,
                         Collectors.counting()));
 
-        // Create candidate results
         List<CandidateResult> candidateResults = candidates.stream()
                 .map(candidate -> {
                     long voteCount = voteCountMap.getOrDefault(candidate.getId(), 0L);
@@ -174,12 +92,13 @@ public class ElectionResultService {
                             candidate.getManifesto(),
                             voteCount);
                 })
-                .sorted((a, b) -> Long.compare(b.getVoteCount(), a.getVoteCount())) // Sort by vote count descending
+                .sorted((a, b) -> Long.compare(b.getVoteCount(), a.getVoteCount()))
                 .collect(Collectors.toList());
 
-        // Mark winner(s) - handle ties
+        // Mark winners (tie-safe)
         if (!candidateResults.isEmpty()) {
             long maxVotes = candidateResults.get(0).getVoteCount();
+
             candidateResults.stream()
                     .filter(cr -> cr.getVoteCount() == maxVotes && maxVotes > 0)
                     .forEach(cr -> cr.setWinner(true));
@@ -193,8 +112,8 @@ public class ElectionResultService {
     }
 
     public List<ElectionResult> getAllElectionResults() {
-        List<Election> elections = electionRepository.findAll();
-        return elections.stream()
+        return electionRepository.findAll()
+                .stream()
                 .map(election -> getElectionResults(election.getId()))
                 .collect(Collectors.toList());
     }

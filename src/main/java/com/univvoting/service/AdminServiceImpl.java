@@ -1,11 +1,10 @@
-// ...existing code...
 package com.univvoting.service;
 
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,19 +18,13 @@ import com.univvoting.repository.OtpAttemptRepository;
 import com.univvoting.repository.UserRepository;
 
 @Service
+@RequiredArgsConstructor
 public class AdminServiceImpl implements AdminService {
 
-    @Autowired
-    private ElectionRepository electionRepository;
-
-    @Autowired
-    private CandidateRepository candidateRepository;
-
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private OtpAttemptRepository otpAttemptRepository;
+    private final ElectionRepository electionRepository;
+    private final CandidateRepository candidateRepository;
+    private final UserRepository userRepository;
+    private final OtpAttemptRepository otpAttemptRepository;
 
     @Override
     public Election createElection(String name, Instant startTime, Instant endTime) {

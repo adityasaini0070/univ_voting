@@ -4,7 +4,6 @@ import com.univvoting.model.TelegramLink;
 import com.univvoting.model.User;
 import com.univvoting.repository.UserRepository;
 import com.univvoting.service.TelegramLinkService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -16,15 +15,15 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.Optional;
 
+import lombok.RequiredArgsConstructor;
+
 @Controller
 @RequestMapping("/profile")
+@RequiredArgsConstructor
 public class ProfileController {
 
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private TelegramLinkService telegramLinkService;
+    private final UserRepository userRepository;
+    private final TelegramLinkService telegramLinkService;
 
     // This method shows the user their profile page.
     @GetMapping
@@ -39,7 +38,8 @@ public class ProfileController {
 
     // This is the new method that generates the token when a button is clicked.
     @PostMapping("/generate-link")
-    public String generateTelegramLink(@AuthenticationPrincipal UserDetails userDetails, RedirectAttributes redirectAttributes) {
+    public String generateTelegramLink(@AuthenticationPrincipal UserDetails userDetails,
+            RedirectAttributes redirectAttributes) {
         // Find the currently logged-in user
         Optional<User> maybeUser = userRepository.findByUniversityId(userDetails.getUsername());
 

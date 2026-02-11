@@ -2,7 +2,7 @@ package com.univvoting.service;
 
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -10,19 +10,25 @@ import com.univvoting.model.User;
 import com.univvoting.repository.UserRepository;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
 
     public boolean deleteUserByUniversityId(String universityId) {
         return userRepository.findByUniversityId(universityId)
-                .map(u -> { userRepository.delete(u); return true; })
+                .map(u -> {
+                    userRepository.delete(u);
+                    return true;
+                })
                 .orElse(false);
     }
+
     public boolean setRoleByUniversityId(String universityId, String newRole) {
         // Prevent setting ADMIN role through this method
         if ("ADMIN".equals(newRole)) {
-            throw new IllegalArgumentException("Admin role cannot be assigned through user management. Use the predefined admin credentials.");
+            throw new IllegalArgumentException(
+                    "Admin role cannot be assigned through user management. Use the predefined admin credentials.");
         }
-        
+
         Optional<User> userOpt = userRepository.findByUniversityId(universityId);
         if (userOpt.isPresent()) {
             User user = userOpt.get();
@@ -32,22 +38,20 @@ public class UserService {
         }
         return false;
     }
-    
-    @Autowired
-    private UserRepository userRepository;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public User register(String universityId, String fullName, String role, String plainPassword, String phoneNumber) {
         Optional<User> ex = userRepository.findByUniversityId(universityId);
-        if (ex.isPresent()) throw new IllegalArgumentException("University ID already registered");
-        
+        if (ex.isPresent())
+            throw new IllegalArgumentException("University ID already registered");
+
         // Only allow VOTER role through registration
         if (!"VOTER".equals(role)) {
             throw new IllegalArgumentException("Only VOTER role is allowed for new registrations");
         }
-        
+
         User u = new User();
         u.setUniversityId(universityId);
         u.setFullName(fullName);

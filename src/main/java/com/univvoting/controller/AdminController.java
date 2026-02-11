@@ -8,7 +8,9 @@ import com.univvoting.model.Candidate;
 import com.univvoting.model.Election;
 import com.univvoting.repository.CandidateRepository;
 import com.univvoting.repository.VoteLedgerRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.univvoting.repository.ElectionRepository;
+import com.univvoting.service.AdminService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.lang.NonNull;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -19,12 +21,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.univvoting.repository.ElectionRepository;
-import com.univvoting.service.AdminService;
-
 @Controller
 @RequestMapping("/admin")
 @PreAuthorize("hasRole('ADMIN')")
+@RequiredArgsConstructor
 public class AdminController {
 
     @GetMapping("/edit-election")
@@ -66,14 +66,10 @@ public class AdminController {
         return "redirect:/admin/elections";
     }
 
-    @Autowired
-    private AdminService adminService;
-    @Autowired
-    private CandidateRepository candidateRepository;
-    @Autowired
-    private ElectionRepository electionRepository;
-    @Autowired
-    private VoteLedgerRepository voteLedgerRepository;
+    private final AdminService adminService;
+    private final CandidateRepository candidateRepository;
+    private final ElectionRepository electionRepository;
+    private final VoteLedgerRepository voteLedgerRepository;
 
     @GetMapping
     public String adminHome(Model model) {
