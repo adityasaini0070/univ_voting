@@ -111,6 +111,7 @@ public class ElectionResultService {
         return result;
     }
 
+    @SuppressWarnings("null")
     public List<ElectionResult> getAllElectionResults() {
         return electionRepository.findAll()
                 .stream()
