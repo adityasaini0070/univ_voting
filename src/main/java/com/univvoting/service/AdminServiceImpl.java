@@ -2,6 +2,7 @@ package com.univvoting.service;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 import lombok.RequiredArgsConstructor;
@@ -76,9 +77,7 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public void updateElection(@NonNull UUID id, String name, Instant startTime, Instant endTime) {
-        if (id == null) {
-            throw new NullPointerException("Election ID cannot be null");
-        }
+        Objects.requireNonNull(id);
 
         var election = electionRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Election not found"));

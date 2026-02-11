@@ -97,7 +97,7 @@ public class ElectionResultService {
 
         // Mark winners (tie-safe)
         if (!candidateResults.isEmpty()) {
-            long maxVotes = candidateResults.get(0).getVoteCount();
+            long maxVotes = candidateResults.getFirst().getVoteCount();
 
             candidateResults.stream()
                     .filter(cr -> cr.getVoteCount() == maxVotes && maxVotes > 0)

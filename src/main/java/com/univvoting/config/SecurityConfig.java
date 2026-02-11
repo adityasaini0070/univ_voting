@@ -15,7 +15,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import com.univvoting.repository.UserRepository;
 
 @Configuration
-@EnableMethodSecurity(prePostEnabled = true)
+@EnableMethodSecurity()
 public class SecurityConfig {
 
     @Value("${spring.security.user.name}")

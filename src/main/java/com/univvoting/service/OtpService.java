@@ -29,10 +29,10 @@ public class OtpService {
 
     @Transactional
     public void generateAndSendOtp(UUID userId) {
-        Optional<User> uopt = userRepository.findById(userId);
-        if (uopt.isEmpty())
+        Optional<User> uotp = userRepository.findById(userId);
+        if (uotp.isEmpty())
             throw new IllegalArgumentException("User not found");
-        User u = uopt.get();
+        User u = uotp.get();
         if (u.getTelegramChatId() == null)
             throw new IllegalStateException("Telegram not linked");
 

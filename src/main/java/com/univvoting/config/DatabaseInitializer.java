@@ -19,7 +19,7 @@ public class DatabaseInitializer implements CommandLineRunner {
     private PasswordEncoder passwordEncoder;
 
     @Override
-    public void run(String... args) throws Exception {
+    public void run(String... args) {
         // Check if database is empty
         long userCount = userRepository.count();
         
@@ -41,11 +41,11 @@ public class DatabaseInitializer implements CommandLineRunner {
             System.out.println("Please change the password after first login.");
             
             // Create some sample voter users for testing
-            createSampleUser("CSE2021001", "Alice Johnson", "VOTER", "9876543210");
-            createSampleUser("CSE2021002", "Bob Smith", "VOTER", "9876543211");
-            createSampleUser("CSE2021003", "Charlie Brown", "VOTER", "9876543212");
-            createSampleUser("CSE2021004", "Diana Prince", "VOTER", "9876543213");
-            createSampleUser("CSE2021005", "Eve Wilson", "VOTER", "9876543214");
+            createSampleUser("CSE2021001", "Alice Johnson", "9876543210");
+            createSampleUser("CSE2021002", "Bob Smith", "9876543211");
+            createSampleUser("CSE2021003", "Charlie Brown", "9876543212");
+            createSampleUser("CSE2021004", "Diana Prince", "9876543213");
+            createSampleUser("CSE2021005", "Eve Wilson", "9876543214");
             
             System.out.println("Sample voter users created (password: 'password123' for all)");
         } else {
@@ -53,11 +53,11 @@ public class DatabaseInitializer implements CommandLineRunner {
         }
     }
     
-    private void createSampleUser(String universityId, String fullName, String role, String phoneNumber) {
+    private void createSampleUser(String universityId, String fullName, String phoneNumber) {
         User user = new User();
         user.setUniversityId(universityId);
         user.setFullName(fullName);
-        user.setRole(role);
+        user.setRole("VOTER");
         user.setPhoneNumber(phoneNumber);
         user.setPasswordHash(passwordEncoder.encode("password123"));
         user.setCreatedAt(Instant.now());

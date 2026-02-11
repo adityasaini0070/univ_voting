@@ -83,7 +83,7 @@ public class TelegramBotService extends TelegramLongPollingBot {
             execute(new org.telegram.telegrambots.meta.api.methods.send.SendMessage(
                     chatId.toString(), text));
         } catch (org.telegram.telegrambots.meta.exceptions.TelegramApiException e) {
-            logger.error("Failed to send Telegram message to chatId: " + chatId, e);
+            logger.error("Failed to send Telegram message to chatId: {}", chatId, e);
         }
     }
 

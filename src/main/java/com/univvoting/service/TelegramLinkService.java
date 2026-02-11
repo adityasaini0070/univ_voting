@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
 import java.util.Base64;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -25,10 +24,6 @@ public class TelegramLinkService {
         t.setUserId(userId);
         t.setToken(token);
         return repo.save(t);
-    }
-
-    public Optional<TelegramLink> findByToken(String token) {
-        return repo.findByToken(token);
     }
 
     public void delete(TelegramLink t) {
